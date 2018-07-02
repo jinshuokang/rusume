@@ -5,8 +5,8 @@ import {
 // promise 封装 Ajax
 export default async(url = '', data = {}, type = 'GET') => {
 	type = type.toUpperCase();
-	let path = '/farmeasy-resume-service/resumeExhibition';
-	// let path = '/resumeExhibition';
+	//let path = '/farmeasy-resume-service/resumeExhibition';
+	let path = '/resumeExhibition';
 	url = baseUrl + path + url;
 	console.log(url);
 	if (type == 'GET') {
