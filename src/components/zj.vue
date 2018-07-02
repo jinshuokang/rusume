@@ -1,15 +1,6 @@
 <template>
-    <!-- 基本模版 -> ( 图 + 文字 + 履历外链 ) -->
-    <el-collapse-item
-        class="acc-li"
-        :name="toData.class"
-        :id="toData.class"
-        v-show="toData.data.generalEntityList.length > 0">
-        <template slot="title">
-            <i class="acc-font"
-                :class="[toData.class, toData.activeNames.includes(toData.class)? 'animation': '']"> {{toData.name}}
-            </i>
-        </template>
+    <!-- 质检信息 基本模版 -->
+    <div>
         <el-row
             class="acc-row"
             :class="item.key == 'IMG' ? '' : 'factory-info'"
@@ -37,7 +28,7 @@
             <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
             </el-button>
         </el-row>
-    </el-collapse-item>
+    </div>
 </template>
 
 <script>
