@@ -186,7 +186,7 @@
 				moreIsShow: false, // 树点击判断页面是否显示
 				moreData: [],      //跳转到更多传参
 				topFloat: false,   // 顶部浮窗何时出现
-				resumeCode: 'LL-20180628-000003', //location.search.split('&')[0].split('=')[1],
+				resumeCode: 'LL-20180703-000002', //location.search.split('&')[0].split('=')[1],
 				templateCode:'RM-20180629-000001',
 				baseInfo: [],    //履历基本信息
 				activeNames: [],   // 手风琴 展开项
@@ -221,7 +221,7 @@
 				/* 基本内容*/		JB: { authenticationBasicInfoList:[], generalEntityList:[] },
 				/* 企业信息*/		QY: { environmentList: [], generalEntityList: [] },
 				/* 种植信息*/		ZZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 田间管理*/		TJ: { fieldManageFarmingList: [],generalEntityList: [], tjArr:[]},
+				/* 田间管理*/		TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
 				/* 采收信息*/		CS: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 初加工信息*/		CJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 深加工信息*/		SJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
@@ -353,7 +353,7 @@
 											}
 											 //  key 或 value 为空 就删除这条记录
 											 // TODO:
-											 if( (val3.hasOwnProperty(key) && !val3.key) || (val3.hasOwnProperty(key) && !val3.value ) ){
+											 if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
 												 val[val2][i][key].splice(j, 1);
 												 continue;
 											 }
@@ -405,6 +405,9 @@
 								for( var j = val[val2][key].length - 1; j >= 0; j--){
 									var val3 = val[val2][key][j];
 									// 履历外链接 单独处理
+									if( val2 == 'JB' &&  val3.key == '产品名称' ){
+										that.name = val3.value || '';
+									}
 									if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
 										if( !val3.resumeName  || !val3.resumeURL ){
 											val[val2][key].splice(j, 1);
@@ -435,20 +438,17 @@
 												})
 												// 循环结束 unshift 图片
 												for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
-													val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
+													farm.generalEntityList.unshift({key:'IMG', value: imgsArr[z]});
 												}
 											}
 										}
 										continue;
-									// 删除之前 拿到想要的数据
-									}else if( val2 == 'JB' &&  val3.key == '产品名称' ){
-										that.name = val3.value || '';
-									// val3.key == 被删除字段
+									// 删除字段
 									}else if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
 										val[val2][key].splice(j, 1);
 										continue;
 									// key 或 value 为空 就删除这条记录
-									}else if( (val3.hasOwnProperty(key) && !val3.key) || (val3.hasOwnProperty(key) && !val3.value ) ){
+									}else if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
 										val[val2][key].splice(j, 1);
 										continue;
 									}
@@ -467,8 +467,10 @@
 									return arr0.indexOf(val0) == index0;
 								})
 								// 循环结束 unshift 图片     企业 logo 单独处理
-								for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
-									val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
+								if( key != 'fieldManageFarmingList' ) {
+									for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
+										val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
+									}
 								}
 							}
 						}
@@ -776,6 +778,9 @@
 				background-size: .16rem .18rem;
 				height: .2rem;
 				font-size: .14rem;
+				// overflow: hidden;
+				// text-overflow: ellipsis;
+				// white-space: nowrap;
 			}
 			.factory-intro {
 				width: 100%;
