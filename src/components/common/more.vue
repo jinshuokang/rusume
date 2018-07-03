@@ -42,7 +42,7 @@
 </script>
 
 <style lang="scss">
-    @import '../assets/style/mixin';
+    @import '../../assets/style/mixin';
     .more-model {
         position: absolute;
         top: 0;

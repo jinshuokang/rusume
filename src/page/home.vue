@@ -1,7 +1,8 @@
 <template>
-    <div id="home">
+    <div id="home" :style="type=='pc'?'maxWidth:375px':''">
 		<!-- 顶部图片  -->
         <div class="head-img" v-show="!moreIsShow">
+			<img :src="logo" alt="">
             <el-row :class="item.key == 'IMG' ? '' : 'factory-info'"
 				v-if="item.key == 'IMG'"
 				:span="24"
@@ -13,7 +14,7 @@
 			</el-row>
         </div>
         <div class="code" v-show="!moreIsShow">
-            <div class="code-font">溯源码 &nbsp;&nbsp;&nbsp;  {{code}}</div>
+            <div class="code-font">溯源码 &nbsp;&nbsp;&nbsp;  {{resumeCode}}</div>
         </div>
 		<!-- 内容区域 -->
         <div class="container clearfix" v-show="!moreIsShow">
@@ -27,15 +28,19 @@
                     <div class="bg-connect-right right"></div>
                 </div>
 				<!-- 第三方企业认证 -->
-                <el-row :gutter="20" class="icon-info" v-show="template.JB.authenticationBasicInfoList.length > 0">
+                <el-row :gutter="20" class="icon-info" v-if="template.JB.authenticationBasicInfoList.length > 0">
                     <el-col
 						:span="24 / template.JB.authenticationBasicInfoList.length"
 						v-for="(item, index) in template.JB.authenticationBasicInfoList"
 						:key="index">
-						<el-button type="text" class="factory-1 ellipsis" @click="thirdActive = index">{{item.authenticationName}}</el-button>
+						<el-button
+						type="text"
+						class="ellipsis"
+						:class="'factory' + index"
+						@click="thirdActive = index">{{item.authenticationName}}</el-button>
 					</el-col>
                 </el-row>
-				<el-row class="icon-info" v-show="template.JB.authenticationBasicInfoList.length > 0">
+				<el-row class="icon-info" v-if="template.JB.authenticationBasicInfoList.length > 0">
 					<el-col
 						class="factory-intro"
 						v-show="thirdActive == index"
@@ -43,6 +48,8 @@
 						v-for="(item, index) in template.JB.authenticationBasicInfoList"
 						:key="index">
 						{{item.companyName}}
+						<div class="factory-intro-top"
+						:style="template.JB.authenticationBasicInfoList.length == 2 ? (index==1 ?'left:60%;':''): (template.JB.authenticationBasicInfoList.length == 3 ? (index==1 ?'left:40%;':(index==2 ?'left:70%;':'')): '')"></div>
 					</el-col>
 				</el-row>
 				<!-- 基本信息 -->
@@ -97,7 +104,7 @@
 				<!-- 种植信息  -->
 				<to-base :toData="{name:'种植信息', class: 'ZZ', activeNames: activeNames, data: template.ZZ}"></to-base>
 				<!-- 田间信息  -->
-				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, activeNames: activeNames}" @viewMore="viewMore"></to-farm>
+				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames}" @viewMore="viewMore"></to-farm>
 				<!-- 采收管理  -->
 				<to-base :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base>
 				<!-- 初加工  -->
@@ -114,7 +121,7 @@
 					class="acc-li"
 					name="ZJ"
 					id="ZJ"
-					v-show="template.ZJ.length > 0">
+					v-show="template.ZJ[0].generalEntityList.length > 0">
 					<template slot="title">
 						<i class="acc-font ZJ" :class="activeNames.includes('ZJ')? 'animation': ''"> 质检信息 </i>
 					</template>
@@ -135,13 +142,15 @@
 				</el-collapse-item>
 			</el-collapse>
         </div>
-		<div id="float_window" ref="floatDom" v-show="topFloat && !moreIsShow">
-			<ul class="window-content" :style="'width:'+ floatInfo.length * (clientW / 3.96) +'px'">
+		<!-- 顶部浮窗 -->
+		<div id="float_window" ref="floatDom" v-show="topFloat && !moreIsShow" :style="type=='pc'?'maxWidth:375px':''">
+			<ul class="window-content" :style="'width:'+ ( floatInfo.length * (clientW / 4) + 10 ) +'px;'">
 				<li
 					v-for="(item,index) in floatInfo"
 					:key="index"
 					ref="topScroll"
-					@click="offsetPosition(item.key, index)">
+					@click="offsetPosition(item.key, index)"
+				>
 					<span :class="{active: item.key == active}">{{item.value}}</span>
 				</li>
 			</ul>
@@ -156,18 +165,20 @@
 
 <script>
 	import fetch from '@/config/fetch'
-	import { isImg, getParams } from '@/config/mUtils'
+	import { isImg, getParams, getType } from '@/config/mUtils'
 	//import BScroll from 'better-scroll'
-	import toBase from '@/components/base'
-	import toFarm from '@/components/farm'
-	import toZj from '@/components/zj'
-	import toMore from '@/components/more'
+	import toBase from '@/components/common/base'
+	import toFarm from '@/components/common/farm'
+	import toZj from '@/components/common/zj'
+	import toMore from '@/components/common/more'
 
     export default {
         data() {
             return {
+				type:'', // PC or Mobile
 				loading: '',    // 加载中......
-				code: '1231232131231231', // 溯源码
+				logo: '',
+				code: '*********', // 溯源码
                 name: '山药',       // 名称
 				thirdActive: 0, // 第三方显示
 				ZJactive: 0,    // 质检信息选中状态
@@ -175,29 +186,42 @@
 				moreIsShow: false, // 树点击判断页面是否显示
 				moreData: [],      //跳转到更多传参
 				topFloat: false,   // 顶部浮窗何时出现
-				resumeCode: 'LL-20180627-000006', //location.search.split('&')[0].split('=')[1],
+				resumeCode: 'LL-20180628-000003', //location.search.split('&')[0].split('=')[1],
 				templateCode:'RM-20180629-000001',
-				resumeList: [],    //履历基本信息
+				baseInfo: [],    //履历基本信息
 				activeNames: [],   // 手风琴 展开项
 				isClick: false,     // 滑动判断的条件
 				moreScrollTop: 0,   // 点击更多获取 滑动距离
 				floatInfo:[         // 根据接口动态删除
-					{key: 'QY', value: '企业信息'},
-					{key: 'ZZ', value: '种植信息'},
-					{key: 'TJ', value: '田间管理'},
-					{key: 'CS', value: '采收信息'},
-					{key: 'CJG', value: '初加工信息'},
-					{key: 'SJG', value: '深加工信息'},
-					{key: 'BZ', value: '包装信息'},
-					{key: 'YCC', value: '原料仓储'},
-					{key: 'CCC', value: '成品仓储'},
-					{key: 'ZJ', value:'质检信息'}
+					{key: 'QY', nameMap: '企业信息', value: '企业信息', isShow: true},
+					{key: 'ZZ', nameMap: '种植信息', value: '种植信息', isShow: true},
+					{key: 'TJ', nameMap: '田间管理', value: '田间管理', isShow: true},
+					{key: 'CS', nameMap: '采收信息', value: '采收信息', isShow: true},
+					{key: 'CJG', nameMap: '加工信息', value: '初加工信息', isShow: true},
+					{key: 'SJG', nameMap: '加工信息', value: '深加工信息', isShow: true},
+					{key: 'BZ', nameMap: '包装信息', value: '包装信息', isShow: true},
+					{key: 'YCC', nameMap: '仓储信息', value: '原料仓储', isShow: true},
+					{key: 'CCC', nameMap: '仓储信息', value: '成品仓储', isShow: true},
+					{key: 'ZJ', nameMap: '质检信息', value:'质检信息', isShow: true}
 				],
-				template: {
+				moduleDelete: { // 待删除的 key
+					'QY': [],
+					'ZZ': [],
+					'TJ': [],
+					'CS': [],
+					'CJG': ['加工类型'],
+					'SJG': ['加工类型'],
+					'BZ': [],
+					'YCC': ['仓储内容'],
+					'CCC': ['仓储内容'],
+					'ZJ': [],
+					'JB': ['产品名称','选择企业']
+				},
+				template: { // lenght == 11  多一个 JB
 				/* 基本内容*/		JB: { authenticationBasicInfoList:[], generalEntityList:[] },
 				/* 企业信息*/		QY: { environmentList: [], generalEntityList: [] },
 				/* 种植信息*/		ZZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 田间管理*/		TJ: { fieldManageFarmingList: []},
+				/* 田间管理*/		TJ: { fieldManageFarmingList: [],generalEntityList: [], tjArr:[]},
 				/* 采收信息*/		CS: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 初加工信息*/		CJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 深加工信息*/		SJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
@@ -213,29 +237,85 @@
 		},
 		created() {
 			this.loading = this.$loading({text:'拼命加载中...'});
+			this.type = getType();
 		},
 		mounted() {
-			window.addEventListener('scroll', this.handleScroll);
+			var that = this;
+			window.addEventListener('scroll', that.handleScroll);
 			//获取 url 参数
-			const params = getParams();
+			const params = getParams(window.location.hash.split('?')[1]);
+			console.log(params)
 			var promiseAll = null;
-			if( !params ) return;
+			// if( JSON.stringify(params) == '{}' ){
+			// 	//	关闭加载中
+			// 	setTimeout( () => {
+			// 		that.loading.close();
+			// 	}, 10);
+			// 	return;
+			// }
+			params.resumeCode = params.resumeCode == undefined ? that.resumeCode : params.resumeCode;
+			params.templateCode = params.templateCode == undefined ? that.templateCode : params.templateCode;
 			if( params.templateCode ){
 				promiseAll = () => {
-					return	Promise.all( [ fetch('/getDetail/' + this.resumeCode ,{}), fetch('/getTemplateDetail/'+this.templateCode,{}) ] );
+					return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}), fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
 				}
 			}else{
 				promiseAll = () => {
-					return	Promise.all( [ fetch('/getDetail/' + this.resumeCode ,{}) ] );
+					return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}) ] );
 				}
 			}
 			promiseAll().then( (datas) => {
 				var data = datas[0];
-				var data2 = datas[1] || datas[0].resumeTemplateDetailList;
+				var data2 = datas[1].data || datas[0].data.resumeTemplateDetailList || null;
 				console.dir(data)
 				console.dir(data2)
-				if( data.code != '0000' ) this.$router.push('/Unfind');
+				if( data.code != '0000' ) that.$router.push('/Unfind');
 
+				var moduleMap = {};
+				// 首先 过滤出所有 type 为2的 key 放入 moduleDelete
+				if( data2 != null && JSON.stringify(data2) != '{}' ){
+					moduleMap = {
+						// moduleFields: 'ALL',
+						enterpriseInfoDataDto: 'QY', environmentDataDto: 'QY',
+						fieldManageDataDto: 'TJ',
+						packingInfoDataDto: 'BZ',
+						plantDataDto: 'ZZ',
+						processInfoDataDto: 'CJG,SJG',
+						qualityInfoDataDto: 'ZJ',
+						recoveryInfoDataDto: 'CS',
+						warehouseInfoDataDto: 'YCC,CCC',
+						basicDataDto:'JB'
+					};
+					// 大的模块显不显示 floatInfo.isShow
+					if ( data2['moduleFields'] && data2['moduleFields'].length > 0 ){
+						data2['moduleFields'].forEach( (val, index) => {
+							if( val.value == 2) {
+								for( let i = 0; i < that.floatInfo.length; i++ ){
+									var val2 = that.floatInfo[i];
+									if( val.key == val2.nameMap ) {
+										that.floatInfo.splice(i, 1);
+										i--;
+									}
+								}
+							}
+						})
+					}
+					// 	此处 企业的环境信息 与 企业信息 都放入 QY 的 moduleDelete 中
+					//  确保这二者中不能有重复的 key 如果有 这里就要改
+					for(var key in data2){
+						if ( !data2[key] || data2[key].length == 0 || !Array.isArray(data2[key])) continue;
+						data2[key].forEach( (val, index) => {
+							if( val.value == 2 && moduleMap[key]){
+								var modules = moduleMap[key].split(','); // QY BZ 等等
+								that.moduleDelete[modules[0]].push(val.key);
+								if( modules[1] ){
+									that.moduleDelete[modules[1]].push(val.key)
+								}
+							}
+						} )
+					}
+				}
+				//  ----------    这里已经处理好模块的显示与否 floatInfo 中     ------------------------------
 				var list = data.data.resumeList || [];
 				list.forEach( (val, index, arr) => {
 					Object.keys(val).forEach( (val2, index2) => {
@@ -251,21 +331,36 @@
 											 delete val[val2][i][key];
 											 continue;
 										 }
+										// 如果 '展示引用履历' 为真 则删掉 externalResumeQuoteDtoList && insideResumeQuoteDtoList
+										 if( that.moduleDelete[val2] && that.moduleDelete[val2].includes('展示引用履历') ){
+											if( key == 'externalResumeQuoteDtoList' ) {
+												delete val[val2][i][key];
+												continue;
+											}
+											if( key == 'insideResumeQuoteDtoList') {
+												delete val[val2][i][key];
+												continue;
+											}
+										}
 										 var imgsArr = [];
 										 if( !Array.isArray(val[val2][i][key]) ) continue;
 										 for( var j = val[val2][i][key].length - 1; j >= 0; j--){
 											 var val3 = val[val2][i][key][j];
-											 if( val3.generalEntityList ){
-
-											 } else
+											 // val3.key == 被删除数组 就删掉
+											if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
+												val[val2][i][key].splice(j, 1);
+												continue;
+											}
 											 //  key 或 value 为空 就删除这条记录
-											 // TODO:  这里范围太大 对象没 key  就删掉一个 是错误的
+											 // TODO:
 											 if( (val3.hasOwnProperty(key) && !val3.key) || (val3.hasOwnProperty(key) && !val3.value ) ){
 												 val[val2][i][key].splice(j, 1);
+												 continue;
 											 }
 											 if( isImg (val3.value) ){
 												var deleteArr = val[val2][i][key].splice(j, 1);
-												imgsArr = deleteArr[0].value.split(',');
+												var imgsOne = deleteArr[0].value.split(',');
+												imgsArr = imgsArr.concat(imgsOne);
 											 }
 										 }
 										 // 去重
@@ -287,63 +382,148 @@
 									delete val[val2][key]
 									continue;
 								}
-								var imgsArr = [];
 								if( !Array.isArray(val[val2][key]) ) continue;
+								var imgsArr = [];
+								// JB 基本信息在这里删除 TODO:
+								if(val2 == 'JB'){
+									if( key == 'authenticationBasicInfoList' &&  that.moduleDelete[val2] && that.moduleDelete[val2].includes('第三方认证') ){
+										delete val[val2][key];
+										continue;
+									}
+								}
+								// 如果 '展示引用履历' 为真 则删掉 externalResumeQuoteDtoList && insideResumeQuoteDtoList
+								if( that.moduleDelete[val2] && that.moduleDelete[val2].includes('展示引用履历') ){
+									if( key == 'externalResumeQuoteDtoList' ) {
+										delete val[val2][key];
+										continue;
+									}
+									if( key == 'insideResumeQuoteDtoList') {
+										delete val[val2][key];
+										continue;
+									}
+								}
 								for( var j = val[val2][key].length - 1; j >= 0; j--){
 									var val3 = val[val2][key][j];
 									// 履历外链接 单独处理
 									if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
 										if( !val3.resumeName  || !val3.resumeURL ){
 											val[val2][key].splice(j, 1);
+											continue;
 										}
-										//  key 或 value 为空 就删除这条记录
+										// 田间管理单独处理
 									}else if( key == 'fieldManageFarmingList'){
+										that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
 										for( var x = 0; x < val[val2][key].length; x++) {
 											var farm = val[val2][key][x];
 											if( farm.generalEntityList && Array.isArray( farm.generalEntityList )){
+												var imgsArr = [];
 												for(var y = farm.generalEntityList.length - 1; y >= 0 ; y--){
 													var val4 = farm.generalEntityList[y];
 													if(!val4.key || !val4.value){
 														farm.generalEntityList.splice(y, 1);
+														continue;
 													}
+													if( isImg (val4.value) ){
+														var deleteArr = farm.generalEntityList.splice(y, 1);
+														var imgsOne = deleteArr[0].value.split(',');
+														imgsArr = imgsArr.concat(imgsOne);
+													}
+												}
+												// 去重
+												imgsArr = imgsArr.filter( (val0,index0,arr0) => {
+													return arr0.indexOf(val0) == index0;
+												})
+												// 循环结束 unshift 图片
+												for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
+													val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
 												}
 											}
 										}
+										continue;
+									// 删除之前 拿到想要的数据
+									}else if( val2 == 'JB' &&  val3.key == '产品名称' ){
+										that.name = val3.value || '';
+									// val3.key == 被删除字段
+									}else if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
+										val[val2][key].splice(j, 1);
+										continue;
+									// key 或 value 为空 就删除这条记录
 									}else if( (val3.hasOwnProperty(key) && !val3.key) || (val3.hasOwnProperty(key) && !val3.value ) ){
 										val[val2][key].splice(j, 1);
+										continue;
 									}
 									if( isImg (val3.value) ){
 										var deleteArr = val[val2][key].splice(j, 1);
-										imgsArr = deleteArr[0].value.split(',');
+										if( val3.key == '企业logo' ){
+											that.logo = val3.value;
+										}else{
+											var imgsOne = deleteArr[0].value.split(',');
+											imgsArr = imgsArr.concat(imgsOne);
+										}
 									}
 								}
 								// 去重
 								imgsArr = imgsArr.filter( (val0,index0,arr0) => {
 									return arr0.indexOf(val0) == index0;
 								})
-								// 循环结束 unshift 图片
+								// 循环结束 unshift 图片     企业 logo 单独处理
 								for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
 									val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
 								}
 							}
 						}
 						// data 赋值
-						this.template[val2] = val[val2];
+						//that.template[val2] = val[val2];
+						Object.assign( that.template[val2], val[val2] );
 					})
 				})
-				//	关闭加载中
+				// 这里判断 template 如果内容 就 将 floatInfo 中的 删掉
+				for(var i = 0; i < that.floatInfo.length; i++){
+					var val = that.floatInfo[i];
+					// 企业 特殊处理
+					if( val.key == 'QY' ){
+						if( that.template.QY.environmentList.length == 0 && that.template.QY.generalEntityList == 0 ){
+							that.floatInfo.splice(i, 1);
+							i--;
+						}
+					// 田间 特殊处理
+					}else if( val.key == 'TJ' ){
+						if ( that.template.TJ.fieldManageFarmingList.length == 0 || that.template.TJ.fieldManageFarmingList[0].generalEntityList.length == 0 ){
+							that.floatInfo.splice(i, 1);
+							i--;
+						}
+					// 质检 特殊处理
+					}else if( val.key == 'ZJ' ){
+						if( that.template.ZJ[0].generalEntityList.length == 0 ) {
+							that.floatInfo.splice(i, 1);
+							i--;
+						}
+					// 其他公共模块
+					}else {
+						if( that.template[val.key].generalEntityList.length == 0 ){
+							that.floatInfo.splice(i, 1);
+							i--;
+						}
+					}
+				}
+
+				//关闭加载中
 				setTimeout( () => {
-					this.loading.close();
+					that.loading.close();
 				},10);
+			}).catch( (res) => {
+				//	关闭加载中
+				console.log(res);
+				setTimeout( () => {
+					that.loading.close();
+				},10);
+				//that.$router.push('/Unfind');
 			})
 		},
         computed: {
 			clientW: function() {
-				return document.documentElement.clientWidth
-			},
-			// moreScrollTop: function() {
-			// 	return document.documentElement.scrollTop;
-			// }
+				return this.type == 'pc' ? 375 : document.documentElement.clientWidth;
+			}
         },
         methods: {
 			// 树苗更多点击
@@ -411,6 +591,7 @@
 				if( !target ||  !target.offsetTop ) return;
 				let offsetT = target.offsetTop - 60;
 				document.documentElement.scrollTop = offsetT;
+				this.isClick = false;
 			}
 			// offsetPosition(id) {
 			// 	this.isClick = true;
@@ -449,8 +630,19 @@
 	// @function px2Rem($px){
     //     @return $px/100px * 1rem
 	// }
+	#home {
+		margin: 0 auto;
+	}
 	.head-img {
 		width:3.75rem;
+		position: relative;
+		>img {
+			position: absolute;
+			top: .2rem;
+			left: .2rem;
+			width: .5rem;
+			z-index:999;
+		}
 	}
 	#float_window {
 		background: #FFF;
@@ -521,8 +713,11 @@
 		.el-button--success.is-plain {
 			border-color: rgba(86, 190, 158, .54);
 			background-color: rgba(88, 191, 159,.05);
+			@include bis('~@/assets/images/tag.png');
+			background-size: .14rem .14rem;
+			background-position: .06rem center;
 		}
-		/* element-ui 样式修改 end */
+		/* elkement-ui 样式修改 end */
         padding: 20px 0;
         background: $color;
         .intro {
@@ -567,9 +762,17 @@
 		}
 		.icon-info {
 			font-size: .14rem;
-			button span {
-				padding-left: .22rem;
+			button.factory0 span{
+				@include bis('~@/assets/images/factory-1.png');
+			}
+			button.factory1 span{
 				@include bis('~@/assets/images/factory-2.png');
+			}
+			button.factory2 span{
+				@include bis('~@/assets/images/factory-3.png');
+			}
+			button.ellipsis span {
+				padding-left: .22rem;
 				background-size: .16rem .18rem;
 				height: .2rem;
 				font-size: .14rem;
@@ -581,6 +784,18 @@
 				text-align: left;
 				@include bR(4px);
 				padding: .05rem 10px;
+				position: relative;
+				.factory-intro-top {
+					position: absolute;
+					width:15px;
+					height:7px;
+					top: -7px;
+					left: 8%;
+					@include bis('~@/assets/images/cart.png');
+				}
+				.factory-intro-top2{
+					left: 20px;
+				}
 			}
 		}
 		.LL-button {
@@ -589,9 +804,9 @@
 			line-height: .3rem;
 			font-size: .14rem;
 			padding: 0 0 0 .22rem;
-			@include bis('~@/assets/images/tag.png');
-			background-size: .14rem .14rem;
-			background-position: .06rem center;
+			// @include bis('~@/assets/images/tag.png');
+			// background-size: .14rem .14rem;
+			// background-position: .06rem center;
 			margin: 0 20px 20px 0;
 			span {
 				color: $color;
@@ -621,7 +836,7 @@
 		padding: .2rem 0;
 		//height: .6rem;
 		line-height: .2rem;
-		border-bottom: 1px dashed $color;
+		border-bottom: 1px dashed $color2;
 	}
 	.accordion-list {
 		font-size: .18rem;

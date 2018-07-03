@@ -28,7 +28,7 @@ export const removeStore = name => {
 /**
  * 是否是图片
  */
-export const isImg = (path) => {
+export const isImg = path => {
     if( /\.(png|jpe?g|gif|svg)(\?.*)?$/.test(path) ) return true;
     else return false;
 }
@@ -36,7 +36,7 @@ export const isImg = (path) => {
  * 获取浏览器传递参数
  */
 
-export const getParams = function( url ) {
+export const getParams = url => {
 	var params = {};
 	var paramString = (url === undefined || url === null) ? window.location.search.substr(1) : url;
 	var paramArray = paramString.split('&');
@@ -50,4 +50,12 @@ export const getParams = function( url ) {
 		params[key] = value;
 	}
 	return params;
+};
+
+export const getType = () => {
+    if((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) {
+      return 'mobile';
+    }else {
+      return 'pc';
+    }
 };

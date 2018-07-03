@@ -1,6 +1,6 @@
 <template>
     <!-- 树 借用外包 -->
-    <el-collapse-item class="acc-li" id="TJ" name="TJ" v-show="toData.data.length > 0">
+    <el-collapse-item class="acc-li" id="TJ" name="TJ" v-if="toData.data.length > 0">
         <template slot="title">
             <i class="acc-font TJ" :class="toData.activeNames.includes('TJ')? 'animation': ''"> 田间管理 </i>
         </template>
@@ -22,36 +22,42 @@
         <div class="tree-footer"></div> -->
         <div class="tree-info-block">
         <div class="tree-head headTreeBg"></div>
-        <div class="tree-body" v-if="toData.data.length==1">
+        <div class="tree-body" v-if="toData.data.length == 1 && toData.data[0].generalEntityList.length > 0">
           <!--第一个为右侧-->
           <div class="tree-w174 headTopTreeBg" >
             <div class="tree-right">
               <div class="tree-line-right treeLineRight"></div>
               <div class="farm-img" @click="viewMore(0)">
-                <img src=""/>
+                <img v-if="toData.data[0].generalEntityList[0].key == 'IMG'"
+                    :src="toData.data[0].generalEntityList[0].value"/>
+                <img v-else
+                    src="~@/assets/images/no-img.png"/>
               </div>
               <div class="txt-flow">
-                {{toData.data[0].generalEntityList[0].value}}
-                <span v-if="toData.data[0].generalEntityList.length>1" @click="viewMore(0)">点击查看更多》</span>
-                <br />
-                <p class="txt-date">{{toData.data[0].generalEntityList[1].value.split(' ')[0]}}</p>
+                {{toData.data2[0].generalEntityList[0].value}}
+                <span @click="viewMore(0)">更多》</span>
+                <br/>
+                <p class="txt-date">{{toData.data2[0].generalEntityList[1].value.split(' ')[0]}}</p>
               </div>
             </div>
           </div>
         </div>
-        <div class="tree-body" v-if="toData.data.length > 1">
+        <div class="tree-body" v-if="toData.data.length > 1 && toData.data[0].generalEntityList.length > 0">
           <!--第一个为右侧-->
           <div class="tree-w174 headTopTreeBg" >
             <div class="tree-right">
               <div class="tree-line-right treeLineRight"></div>
               <div class="farm-img" @click="viewMore(0)">
-                <img/>
+                <img v-if="toData.data[0].generalEntityList[0].key == 'IMG'"
+                    :src="toData.data[0].generalEntityList[0].value"/>
+                <img v-else
+                    src="~@/assets/images/no-img.png"/>
               </div>
               <div class="txt-flow">
-                {{toData.data[0].generalEntityList[0].value}}
-                <span v-if="toData.data[0].generalEntityList.length>1" @click="viewMore(0)">点击查看更多》</span>
-                <br />
-                <p class="txt-date">{{toData.data[0].generalEntityList[1].value.split(' ')[0]}}</p>
+                {{toData.data2[0].generalEntityList[0].value}}
+                <span @click="viewMore(0)">更多》</span>
+                <br/>
+                <p class="txt-date">{{toData.data2[0].generalEntityList[1].value.split(' ')[0]}}</p>
               </div>
             </div>
           </div>
@@ -61,13 +67,16 @@
               <div class="tree-left">
                 <div class="tree-line-left treeLineleft"></div>
                 <div class="farm-img" @click="viewMore(index + 1)">
-                  <img/>
+                  <img v-if="item.generalEntityList[0].key == 'IMG'"
+                      :src="item.generalEntityList[0].value"/>
+                  <img v-else
+                      src="~@/assets/images/no-img.png"/>
                 </div>
                 <div class="txt-flow">
-                  {{item.generalEntityList[0].value}}
-                  <span @click="viewMore(index + 1)">点击查看更多》</span>
-                  <br />
-                  <p class="txt-date">{{ item.generalEntityList[1].value.split(' ')[0] }}</p>
+                  {{toData.data2.slice(1)[index].generalEntityList[0].value}}
+                  <span @click="viewMore(index + 1)">更多》</span>
+                  <br/>
+                  <p class="txt-date">{{ toData.data2.slice(1)[index].generalEntityList[1].value.split(' ')[0] }}</p>
                 </div>
               </div>
             </div>
@@ -75,13 +84,16 @@
               <div class="tree-right">
                 <div class="tree-line-right treeLineRight"></div>
                 <div class="farm-img" @click="viewMore(index + 1)">
-                  <img/>
+                  <img v-if="item.generalEntityList[0].key == 'IMG'"
+                      :src="item.generalEntityList[0].value"/>
+                  <img v-else
+                      src="~@/assets/images/no-img.png"/>
                 </div>
                 <div class="txt-flow">
-                  {{item.generalEntityList[0].value}}
-                  <span @click="viewMore(index + 1)">点击查看更多》</span>
-                  <br />
-                  <p class="txt-date">{{ item.generalEntityList[1].value.split(' ')[0] }}</p>
+                  {{toData.data2.slice(1)[index].generalEntityList[0].value}}
+                  <span @click="viewMore(index + 1)">更多》</span>
+                  <br/>
+                  <p class="txt-date">{{ toData.data2.slice(1)[index].generalEntityList[1].value.split(' ')[0] }}</p>
                 </div>
               </div>
             </div>
@@ -109,7 +121,7 @@
 </script>
 
 <style lang='scss'>
-    @import '../assets/style/mixin';
+    @import '../../assets/style/mixin';
     // .tree-content {
     //     position: relative;
     // }
