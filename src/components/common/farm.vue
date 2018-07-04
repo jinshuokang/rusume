@@ -1,6 +1,6 @@
 <template>
     <!-- 树 借用外包 -->
-    <el-collapse-item class="acc-li" id="TJ" name="TJ" v-if="toData.data.length > 0">
+    <el-collapse-item class="acc-li" id="TJ" name="TJ" v-if="toData.data.length > 0 && toData.data[0].generalEntityList.length > 0">
         <template slot="title">
             <i class="acc-font TJ" :class="toData.activeNames.includes('TJ')? 'animation': ''"> 田间管理 </i>
         </template>

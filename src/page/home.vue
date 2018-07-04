@@ -49,7 +49,7 @@
 						:key="index">
 						{{item.companyName}}
 						<div class="factory-intro-top"
-						:style="template.JB.authenticationBasicInfoList.length == 2 ? (index==1 ?'left:60%;':''): (template.JB.authenticationBasicInfoList.length == 3 ? (index==1 ?'left:40%;':(index==2 ?'left:70%;':'')): '')"></div>
+						:style="template.JB.authenticationBasicInfoList.length == 2 ? (index==1 ?'left:60%;':''): (template.JB.authenticationBasicInfoList.length == 3 ? (index==1 ?'left:44%;':(index==2 ?'left:80%;':'')): '')"></div>
 					</el-col>
 				</el-row>
 				<!-- 基本信息 -->
@@ -130,11 +130,10 @@
 							v-for="(item, index) in template.ZJ"
 							:key="index"
 						>
-						<div
-							class="zj-button"
-							:class="{ZJactive: index == ZJactive}"
-							@click="ZJactive = index"
-						>{{111}}
+							<div
+								class="zj-button"
+								:class="{ZJactive: index == ZJactive}"
+								@click="ZJactive = index">{{item.activeName}}
 						</div>
 						</el-col>
 					</el-row>
@@ -165,7 +164,7 @@
 
 <script>
 	import fetch from '@/config/fetch'
-	import { isImg, getParams, getType } from '@/config/mUtils'
+	import { isImg, getParams, getType, throttle, getModuleType } from '@/config/mUtils'
 	//import BScroll from 'better-scroll'
 	import toBase from '@/components/common/base'
 	import toFarm from '@/components/common/farm'
@@ -186,14 +185,14 @@
 				moreIsShow: false, // 树点击判断页面是否显示
 				moreData: [],      //跳转到更多传参
 				topFloat: false,   // 顶部浮窗何时出现
-				resumeCode: 'LL-20180703-000002', //location.search.split('&')[0].split('=')[1],
+				resumeCode: 'LL-20180703-000002', // 默认码
 				templateCode:'RM-20180629-000001',
 				baseInfo: [],    //履历基本信息
 				activeNames: [],   // 手风琴 展开项
 				isClick: false,     // 滑动判断的条件
 				moreScrollTop: 0,   // 点击更多获取 滑动距离
 				floatInfo:[         // 根据接口动态删除
-					{key: 'QY', nameMap: '企业信息', value: '企业信息', isShow: true},
+					{key: 'QY', nameMap: '企业信息', value: '企业信息', isShow: true}, // isShow 其实可以不要
 					{key: 'ZZ', nameMap: '种植信息', value: '种植信息', isShow: true},
 					{key: 'TJ', nameMap: '田间管理', value: '田间管理', isShow: true},
 					{key: 'CS', nameMap: '采收信息', value: '采收信息', isShow: true},
@@ -228,7 +227,7 @@
 				/* 包装信息*/	    BZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 原料仓储信息*/	YCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 成品仓储*/		CCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 质检信息*/		ZJ: [{generalEntityList: []}],
+				/* 质检信息*/		ZJ: [{generalEntityList: [], activeName: ''}],
 				},
             }
 		},
@@ -241,35 +240,56 @@
 		},
 		mounted() {
 			var that = this;
-			window.addEventListener('scroll', that.handleScroll);
+			window.addEventListener('scroll', throttle(that.handleScroll, 300, 500));
 			//获取 url 参数
 			const params = getParams(window.location.hash.split('?')[1]);
-			console.log(params)
 			var promiseAll = null;
-			// if( JSON.stringify(params) == '{}' ){
-			// 	//	关闭加载中
-			// 	setTimeout( () => {
-			// 		that.loading.close();
-			// 	}, 10);
-			// 	return;
-			// }
-			params.resumeCode = params.resumeCode == undefined ? that.resumeCode : params.resumeCode;
-			params.templateCode = params.templateCode == undefined ? that.templateCode : params.templateCode;
-			if( params.templateCode ){
-				promiseAll = () => {
-					return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}), fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
+			//   真正上线 打开这个
+			if( JSON.stringify(params) == '{}' ){
+				//	关闭加载中
+				setTimeout( () => {
+					that.loading.close();
+					that.$router.push('/Unfind');
+				}, 10);
+				return;
+			}
+			that.resumeCode = params.resumeCode;
+			// params.resumeCode = params.resumeCode == undefined ? that.resumeCode : params.resumeCode;
+			// params.templateCode = params.templateCode == undefined ? that.templateCode : params.templateCode;
+			if( params.templateCode ){ // 预览
+				if( params.resumeCode == 'xxxxxxxxxxxxxxxxxxxx' || !params.resumeCode ) {
+					promiseAll = () => {
+						return	Promise.all( [ 'x', fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
+					}
+				}else {
+					promiseAll = () => {
+						return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}), fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
+					}
 				}
-			}else{
+			}else { // 扫码
 				promiseAll = () => {
 					return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}) ] );
 				}
 			}
 			promiseAll().then( (datas) => {
 				var data = datas[0];
-				var data2 = datas[1].data || datas[0].data.resumeTemplateDetailList || null;
-				console.dir(data)
-				console.dir(data2)
-				if( data.code != '0000' ) that.$router.push('/Unfind');
+				// 如果为空或者20个 x  则使用固定数据;
+				if( data == 'x' ) {
+					data = '{"code":"0000","message":"访问成功","data":{"resumeList":[{"JB":{"generalEntityList":[{"key":"产品名称","value":"111222","type":1},{"key":"基原名称","value":"","type":1},{"key":"部位","value":"","type":1},{"key":"规格","value":"","type":1},{"key":"生产模式","value":"","type":7},{"key":"生产标准","value":"","type":1},{"key":"简要介绍","value":"","type":1},{"key":"选择企业","value":"QY-20180702-000006","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180611/152871984691041ebb.jpg","type":1}],"authenticationBasicInfoList":[],"enterpriseInfoCode":"QY-20180702-000006","enterpriseName":"上药华宇（平邑）中药资源有限公司"}},{"QY":{"generalEntityList":[{"key":"企业名称","value":"上药华宇（平邑）中药资源有限公司","type":1},{"key":"企业位置","value":"山东临沂市平邑县","type":1},{"key":"统一社会信用代码","value":"91110117696389412O","type":1},{"key":"负责人","value":"谈景福","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/153050147042089c9c.jpg,http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530501493021273c9.jpg","type":1},{"key":"企业logo","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530499683909bcad7.png","type":1}],"environmentList":[{"key":"使用水源","value":"池塘水,农业设施用水,自然降雨","type":1},{"key":"地形","value":"丘陵","type":1},{"key":"海拔","value":"100M","type":1},{"key":"土壤类型","value":"沙壤土","type":1},{"key":"土壤酸碱度","value":"弱碱性","type":1},{"key":"气候类型","value":"亚热带季风气候","type":1},{"key":"年降雨量","value":"1111mm","type":1},{"key":"年平均温度","value":"20℃","type":1}]}},{"TJ":{"generalEntityList":[{"key":"农事展示时段","value":"2018-06-07,2018-07-26","type":5},{"key":"种植批次号","value":"ZZ-20180702-000008","type":1}],"fieldManageFarmingList":[{"generalEntityList":[{"key":"农事类型","value":"cs农事类型","type":1},{"key":"操作时间","value":"2018-07-02","type":4},{"key":"投入品","value":"cs投入品","type":1},{"key":"投入设备","value":"cs投入设备","type":1},{"key":"农事内容","value":"cs农事内容","type":1},{"key":"负责人","value":"cs负责人","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530511231809c2a9c.png","type":1}]}]}},{"ZZ":{"generalEntityList":[{"key":"种植面积","value":"cs种植面积1234305 m","type":1},{"key":"种植批次号","value":"zz20180702001","type":1},{"key":"地块编号","value":"DK20180702001","type":1},{"key":"生产时间","value":"2018-07-02","type":4},{"key":"种植标准","value":"CS种植标准","type":1},{"key":"负责人","value":"cs负责人","type":1}],"insideResumeQuoteDtoList":[{"resumeCode":"LL-20180702-000004","resumeType":1,"resumeName":"铁棍山药1","resumeURL":""},{"resumeCode":"LL-20180702-000006","resumeType":1,"resumeName":"测试——产品名称","resumeURL":""}],"externalResumeQuoteDtoList":[]}},{"CS":{"generalEntityList":[{"key":"采收批次号","value":"CS20180702002","type":1},{"key":"种植批次号","value":"ZZ-20180702-000008","type":1},{"key":"采收数量","value":"cs采收数量","type":2},{"key":"采收时间","value":"2018-07-02","type":4},{"key":"采收方式","value":"cs采收方式","type":1},{"key":"负责人","value":"cs负责人","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/153051138563362999.png","type":1}],"insideResumeQuoteDtoList":[{"resumeCode":"LL-20180702-000006","resumeType":1,"resumeName":"测试——产品名称","resumeURL":""}],"externalResumeQuoteDtoList":[],"correspondingCode":"ZZ-20180702-000008"}},{"SJG":{"generalEntityList":[{"key":"加工批次号","value":"JG20180702003","type":1},{"key":"对应批次号","value":"CS-20180702-000007","type":1},{"key":"加工类型","value":"2","type":1},{"key":"加工数量","value":"CS加工数量","type":2},{"key":"加工工艺","value":"CS加工数量","type":1},{"key":"操作时间","value":"2018-07-02","type":4},{"key":"负责人","value":"CS负责人","type":1},{"key":"辅料信息","value":"CS辅料信息","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530511665038b70c0.png","type":1}],"insideResumeQuoteDtoList":[],"externalResumeQuoteDtoList":[],"correspondingCode":"CS-20180702-000007"}},{"BZ":{"generalEntityList":[{"key":"包装批次号","value":"BZ201807020006","type":1},{"key":"对应批次号","value":"SJG-20180702-000004","type":1},{"key":"包装方式","value":"cs.   包 装方. 式","type":1},{"key":"包装日期","value":"2018-07-02 14:09,2018-07-02 14:09","type":6},{"key":"包装数量","value":"cs包装数量","type":2},{"key":"负责人","value":"cs负责人","type":1},{"key":"包装规格","value":"cs包装规格","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/15305118258871e17b.png","type":1}],"insideResumeQuoteDtoList":[],"externalResumeQuoteDtoList":[],"correspondingCode":"SJG-20180702-000004"}}],"resumeTemplateDetailList":null}}';
+					data = JSON.parse( data );
+				}
+				var data2 = null;
+				if( params.templateCode ) {
+					data2 = (datas[1] && datas[1].data) || null;
+				}else {
+					data2 = (datas[0] && datas[0].data.resumeTemplateDetailList) || null;
+				}
+				console.dir(data);
+				console.dir(data2);
+				if( !data || data.code != '0000' ) {
+					that.loading.close();
+					that.$router.push('/Unfind');
+				}
 
 				var moduleMap = {};
 				// 首先 过滤出所有 type 为2的 key 放入 moduleDelete
@@ -346,6 +366,10 @@
 										 if( !Array.isArray(val[val2][i][key]) ) continue;
 										 for( var j = val[val2][i][key].length - 1; j >= 0; j--){
 											 var val3 = val[val2][i][key][j];
+											 // 构造质检信息 Tab
+											 if(val2 == 'ZJ' && val3.key == '检测产品批次'){
+												 val[val2][i]['activeName'] = getModuleType(val3.value);
+											 }
 											 // val3.key == 被删除数组 就删掉
 											if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
 												val[val2][i][key].splice(j, 1);
@@ -356,7 +380,11 @@
 											 if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
 												 val[val2][i][key].splice(j, 1);
 												 continue;
-											 }
+											 }else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
+												if ( val3.value.indexOf(',') != -1 ){
+													val3.value = val3.value.split(',').join(' ~ ');
+												}
+											}
 											 if( isImg (val3.value) ){
 												var deleteArr = val[val2][i][key].splice(j, 1);
 												var imgsOne = deleteArr[0].value.split(',');
@@ -425,6 +453,10 @@
 													if(!val4.key || !val4.value){
 														farm.generalEntityList.splice(y, 1);
 														continue;
+													}else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
+														if ( val3.value.indexOf(',') != -1 ){
+															val3.value = val3.value.split(',').join(' ~ ');
+														}
 													}
 													if( isImg (val4.value) ){
 														var deleteArr = farm.generalEntityList.splice(y, 1);
@@ -451,6 +483,10 @@
 									}else if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
 										val[val2][key].splice(j, 1);
 										continue;
+									}else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
+										if ( val3.value.indexOf(',') != -1 ){
+											val3.value = val3.value.split(',').join(' ~ ');
+										}
 									}
 									if( isImg (val3.value) ){
 										var deleteArr = val[val2][key].splice(j, 1);
@@ -519,7 +555,7 @@
 				setTimeout( () => {
 					that.loading.close();
 				},10);
-				//that.$router.push('/Unfind');
+				that.$router.push('/Unfind');
 			})
 		},
         computed: {
@@ -531,6 +567,7 @@
 			// 树苗更多点击
 			viewMore(index){
 				this.moreScrollTop = document.documentElement.scrollTop;
+				document.documentElement.scrollTop = 0;
 				this.moreIsShow = true;
 				this.moreData = this.template.TJ.fieldManageFarmingList[index];
 			},
@@ -540,6 +577,18 @@
 				this.$nextTick( () => {
 					document.documentElement.scrollTop = this.moreScrollTop;
 				})
+			},
+			//顶部浮窗点击
+			offsetPosition(id, index) {
+				this.isClick = true;
+				this.active = id;
+				var target = document.querySelector('#' + id);
+				if( !target ||  !target.offsetTop ) return;
+				let offsetT = target.offsetTop - 60;
+				if(document.documentElement.scrollTop != offsetT) document.documentElement.scrollTop = offsetT;
+				setTimeout( () => {
+					this.isClick = false;
+				}, 600)
 			},
 			// 中间模块下拉点击
 			handleChange(val) {
@@ -574,6 +623,7 @@
 								this.active = val.key;
 								var oneWidth = this.clientW / 4;
 								var topTarget = this.$refs.topScroll[index];
+								if( !topTarget ) return;
 								var offsetL = topTarget.offsetLeft;
 								if( offsetL > this.clientW / 4 * 2 + 10 ) {
 									this.$refs.floatDom.scrollLeft = offsetL - ( this.clientW / 4 * 2 );
@@ -584,39 +634,8 @@
 						}
 					})
 				}
-			},
-			//顶部浮窗点击
-			offsetPosition(id, index) {
-				this.isClick = true;
-				this.active = id;
-				var target = document.querySelector('#' + id);
-				if( !target ||  !target.offsetTop ) return;
-				let offsetT = target.offsetTop - 60;
-				document.documentElement.scrollTop = offsetT;
-				this.isClick = false;
 			}
-			// offsetPosition(id) {
-			// 	this.isClick = true;
-			// 	this.active = id;
-			// 	let offset = document.querySelector('#' + id).offsetTop - 100;
-			// 	var gap = Math.abs( document.documentElement.scrollTop - offset);
-			// 	var one = gap / 100;
-			// 	var timer = setInterval(function(){
-			// 		if ( document.documentElement.scrollTop > offset ) {
-			// 			var pice = document.documentElement.scrollTop - one;
-			// 			document.documentElement.scrollTop = pice;
-			// 			console.log(one)
-			// 			console.log(document.documentElement.scrollTop)
-			// 		}else if(document.documentElement.scrollTop < offset){
-			// 			document.documentElement.scrollTop += one;
-			// 			console.log(one)
-			// 			console.log(document.documentElement.scrollTop)
-			// 		}else if(document.documentElement.scrollTop == offset){
-			// 			this.isClick = false;
-			// 			clearInterval(timer);
-			// 		}
-			// 	}, 16.7)
-			// }
+
 		},
 		destroyed () {
 			// 移除 window 事件
@@ -773,14 +792,20 @@
 			button.factory2 span{
 				@include bis('~@/assets/images/factory-3.png');
 			}
+			button.ellipsis {
+				width: 100%;
+			}
 			button.ellipsis span {
-				padding-left: .22rem;
+				padding-left: .20rem;
 				background-size: .16rem .18rem;
 				height: .2rem;
+				line-height: .19rem;
 				font-size: .14rem;
-				// overflow: hidden;
-				// text-overflow: ellipsis;
-				// white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width:100%;
+				display: inline-block;
 			}
 			.factory-intro {
 				width: 100%;
