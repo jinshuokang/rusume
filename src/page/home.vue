@@ -837,9 +837,12 @@
 			// @include bis('~@/assets/images/tag.png');
 			// background-size: .14rem .14rem;
 			// background-position: .06rem center;
-			margin: 0 20px 20px 0;
+			margin: 0 20px 20px 0!important;
 			span {
 				color: $color;
+			}
+			&:hover{
+				color: #fff;
 			}
 		}
 		.LL-href {

@@ -26,13 +26,13 @@
         >
             <el-button type="success" class="LL-button" plain
                 v-for="(item, index) in toData.data.insideResumeQuoteDtoList"
-                :key="index"
+                :key="item.resumeURL + index"
             >
             <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
             </el-button>
             <el-button type="success" class="LL-button" plain
                 v-for="(item, index) in toData.data.externalResumeQuoteDtoList"
-                :key="index"
+                :key="item.resumeURL + index"
             >
             <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
             </el-button>
