@@ -104,3 +104,20 @@ export const getModuleType = (code) => {
 	}
 	return tab + '质检';
 }
+
+/**
+ * 获取 scrollTop
+ */
+
+export const getScrollTop = () => {
+	return document.documentElement.scrollTop || document.body.scrollTop;
+}
+
+ /**
+  * 设置scrollTop
+  */
+export const setScrollTop = (code) => {
+	document.documentElement.scrollTop = code;
+	document.body.scrollTop = code;
+}
+

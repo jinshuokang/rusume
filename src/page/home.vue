@@ -164,7 +164,7 @@
 
 <script>
 	import fetch from '@/config/fetch'
-	import { isImg, getParams, getType, throttle, getModuleType } from '@/config/mUtils'
+	import { isImg, getParams, getType, throttle, getModuleType, getScrollTop, setScrollTop } from '@/config/mUtils'
 	//import BScroll from 'better-scroll'
 	import toBase from '@/components/common/base'
 	import toFarm from '@/components/common/farm'
@@ -240,7 +240,7 @@
 		},
 		mounted() {
 			var that = this;
-			window.addEventListener('scroll', throttle(that.handleScroll, 300, 500));
+			window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
 			//获取 url 参数
 			const params = getParams(window.location.hash.split('?')[1]);
 			var promiseAll = null;
@@ -569,8 +569,8 @@
         methods: {
 			// 树苗更多点击
 			viewMore(index){
-				this.moreScrollTop = document.documentElement.scrollTop;
-				document.documentElement.scrollTop = 0;
+				this.moreScrollTop = getScrollTop();
+				setScrollTop(0);
 				this.moreIsShow = true;
 				this.moreData = this.template.TJ.fieldManageFarmingList[index];
 			},
@@ -578,20 +578,21 @@
 			closeMore() {
 				this.moreIsShow = false;
 				this.$nextTick( () => {
-					document.documentElement.scrollTop = this.moreScrollTop;
+					setScrollTop(this.moreScrollTop);
 				})
 			},
 			//顶部浮窗点击
 			offsetPosition(id, index) {
+				var scrollTop = getScrollTop();
 				this.isClick = true;
 				this.active = id;
 				var target = document.querySelector('#' + id);
 				if( !target ||  !target.offsetTop ) return;
 				let offsetT = target.offsetTop - 60;
-				if(document.documentElement.scrollTop != offsetT) document.documentElement.scrollTop = offsetT;
+				if(scrollTop != offsetT) setScrollTop(offsetT);
 				setTimeout( () => {
 					this.isClick = false;
-				}, 600)
+				}, 400)
 			},
 			// 中间模块下拉点击
 			handleChange(val) {
@@ -606,7 +607,7 @@
 			handleScroll(e){
 				if (this.isClick) return;
 				// 页面滑动距离
-				var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+				var scrollTop = getScrollTop();
 				// 元素距离顶部距离
 				let offsetTop = document.querySelector('#QY').offsetTop;
 				// 页面可视区域高度
