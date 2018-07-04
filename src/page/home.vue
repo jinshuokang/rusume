@@ -430,6 +430,10 @@
 										continue;
 									}
 								}
+								// 田间管理 拷贝
+								if( val2 == 'TJ' &&  key == 'fieldManageFarmingList' ){
+									that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
+								}
 								for( var j = val[val2][key].length - 1; j >= 0; j--){
 									var val3 = val[val2][key][j];
 									// 履历外链接 单独处理
@@ -442,8 +446,7 @@
 											continue;
 										}
 										// 田间管理单独处理
-									}else if( key == 'fieldManageFarmingList'){
-										that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
+									}else if( val2 == 'TJ' &&  key == 'fieldManageFarmingList'){
 										for( var x = 0; x < val[val2][key].length; x++) {
 											var farm = val[val2][key][x];
 											if( farm.generalEntityList && Array.isArray( farm.generalEntityList )){
@@ -806,6 +809,7 @@
 				white-space: nowrap;
 				width:100%;
 				display: inline-block;
+				text-align: left;
 			}
 			.factory-intro {
 				width: 100%;
