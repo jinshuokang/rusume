@@ -18,14 +18,18 @@
             <el-button type="success" class="LL-button" plain
                 v-for="(item, index) in toData.data.insideResumeQuoteDtoList"
                 :key="item.resumeURL + index"
+                @click="hrefClick(item.resumeURL)"
             >
-                <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
+                <!-- <a class="LL-href" :href="item.resumeURL"></a> -->
+                {{item.resumeName}}
             </el-button>
             <el-button type="success" class="LL-button" plain
                 v-for="(item, index) in toData.data.externalResumeQuoteDtoList"
                 :key="item.resumeURL + index"
+                @click="hrefClick(item.resumeURL)"
             >
-                <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
+                <!-- <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a> -->
+                {{item.resumeName}}
             </el-button>
         </el-row>
     </div>
@@ -36,6 +40,11 @@
         props: ['toData'],
         data() {
             return {
+            }
+        },
+        methods: {
+            hrefClick(url) {
+                this.$emit('hrefClick', url)
             }
         },
     }

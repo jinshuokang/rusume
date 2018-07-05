@@ -122,40 +122,8 @@
 
 <style lang='scss'>
     @import '../../assets/style/mixin';
-    // .tree-content {
-    //     position: relative;
-    // }
-    // .one-branch{
-    //     border:1px solid red;
-    //     width: 50%;
-    //     position: absolute;
-    //     left:50%;
-    //     height:1rem;
-    //     .branch-img {
-    //         width: .54rem;
-    //         height: .54rem;
-    //     }
-    // }
-    // .tree-header {
-    //     @include bis('~@/assets/images/tree-head.png');
-    //     width: 100%;
-    //     height: 1rem;
-    // }
-    // .tree-body {
-    //     @include bis('~@/assets/images/tree-body.png');
-    //     width: 100%;
-    //     height: 2rem;
-    // }
-    // .tree-body-one {
-    //     @include bis('~@/assets/images/tree-body-one.png');
-    //     width: 100%;
-    //     height: 1rem;
-    // }
-    // .tree-footer {
-    //     @include bis('~@/assets/images/tree-foot.png');
-    //     width: 100%;
-    //     height: 1rem;
-    // }
+
+
 @function pxToRem($px) {
   @return $px/100px*1rem;
 }
