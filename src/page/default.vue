@@ -102,20 +102,20 @@
                 	</el-row>
 				</el-collapse-item>
 				<!-- 种植信息  -->
-				<to-base @hrefClick="hrefClick" :toData="{name:'种植信息', class: 'ZZ', activeNames: activeNames, data: template.ZZ}"></to-base>
+				<to-base :toData="{name:'种植信息', class: 'ZZ', activeNames: activeNames, data: template.ZZ}"></to-base>
 				<!-- 田间信息  -->
 				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames}" @viewMore="viewMore"></to-farm>
 				<!-- 采收管理  -->
-				<to-base @hrefClick="hrefClick" :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base>
+				<to-base :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base>
 				<!-- 初加工  -->
-				<to-base @hrefClick="hrefClick" :toData="{name:'初加工信息', activeNames: activeNames, class: 'CJG', data: template.CJG}"></to-base>
+				<to-base :toData="{name:'初加工信息', activeNames: activeNames, class: 'CJG', data: template.CJG}"></to-base>
 				<!-- 深加工  -->
-				<to-base @hrefClick="hrefClick" :toData="{name:'深加工信息', activeNames: activeNames, class: 'SJG', data: template.SJG}"></to-base>
+				<to-base :toData="{name:'深加工信息', activeNames: activeNames, class: 'SJG', data: template.SJG}"></to-base>
 				<!-- 包装信息 -->
-				<to-base @hrefClick="hrefClick" :toData="{name:'包装信息', activeNames: activeNames, class: 'BZ', data: template.BZ}"></to-base>
+				<to-base :toData="{name:'包装信息', activeNames: activeNames, class: 'BZ', data: template.BZ}"></to-base>
 				<!-- 仓储信息  -->
-				<to-base @hrefClick="hrefClick" :toData="{name:'原料仓储', activeNames: activeNames, class: 'YCC', data: template.YCC}"></to-base>
-				<to-base @hrefClick="hrefClick" :toData="{name:'成品仓储', activeNames: activeNames, class: 'CCC', data: template.CCC}"></to-base>
+				<to-base :toData="{name:'原料仓储', activeNames: activeNames, class: 'YCC', data: template.YCC}"></to-base>
+				<to-base :toData="{name:'成品仓储', activeNames: activeNames, class: 'CCC', data: template.CCC}"></to-base>
 				<!-- 质检信息  -->
 				<el-collapse-item
 					class="acc-li"
@@ -137,7 +137,7 @@
 						</div>
 						</el-col>
 					</el-row>
-					<to-zj @hrefClick="hrefClick" :toData="{data: template.ZJ[ZJactive]}"></to-zj>
+					<to-zj :toData="{data: template.ZJ[ZJactive]}"></to-zj>
 				</el-collapse-item>
 			</el-collapse>
         </div>
@@ -353,7 +353,7 @@
 									 val[val2].splice(i, 1);
 									 i--;
 								 }else{
-									 for(var key in val[val2][i]){
+									for(var key in val[val2][i]){
 										 if( !val[val2][i][key] ) {
 											 delete val[val2][i][key];
 											 continue;
@@ -382,6 +382,19 @@
 												val[val2][i][key].splice(j, 1);
 												continue;
 											}
+											// 履历链接处理
+											if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
+												if(key == 'externalResumeQuoteDtoList') {
+													if( !val3.resumeName  || !val3.resumeURL ){
+														val[val2][i][key].splice(j, 1);
+														continue;
+													}
+												}else {
+													let resumeCode = val3.resumeCode;
+													let url = window.location.href.split('#')[0];
+													val3.resumeURL = url + '#/?resumeCode=' + resumeCode;
+												}
+											}
 											 //  key 或 value 为空 就删除这条记录
 											 // TODO:
 											 if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
@@ -403,7 +416,7 @@
 											return arr0.indexOf(val0) == index0;
 										 })
 										 // 循环结束 unshift 图片
-										 for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
+										 for( let z = imgsArr.length - 1; z >= 0; z-- ){
 											val[val2][i][key].unshift({key:'IMG', value: imgsArr[z]});
 										 }
 									 }
@@ -448,9 +461,15 @@
 										that.name = val3.value || '';
 									}
 									if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
-										if( !val3.resumeName  || !val3.resumeURL ){
-											val[val2][key].splice(j, 1);
-											continue;
+										if(key == 'externalResumeQuoteDtoList') {
+											if( !val3.resumeName  || !val3.resumeURL ){
+												val[val2][key].splice(j, 1);
+												continue;
+											}
+										}else {
+											let resumeCode = val3.resumeCode;
+											let url = window.location.href.split('#')[0];
+											val3.resumeURL = url + '#/?resumeCode=' + resumeCode;
 										}
 										// 田间管理单独处理
 									}else if( val2 == 'TJ' &&  key == 'fieldManageFarmingList'){
@@ -577,9 +596,6 @@
 			// }
         },
         methods: {
-			hrefClick(url){
-				window.location.href = url;
-			},
 			// 树苗更多点击
 			viewMore(index){
 				this.moreScrollTop = getScrollTop();
@@ -748,13 +764,6 @@
 			background: #ededed;
 			@include bR(4px);
 		}
-		.el-button--success.is-plain {
-			border-color: rgba(86, 190, 158, .54);
-			background-color: rgba(88, 191, 159,.05);
-			@include bis('~@/assets/images/tag.png');
-			background-size: .14rem .14rem;
-			background-position: .06rem center;
-		}
 		/* elkement-ui 样式修改 end */
         padding: 20px 0;
         background: $color;
@@ -847,25 +856,29 @@
 			}
 		}
 		.LL-button {
+			display: inline-block;
+			cursor: pointer;
 			height: .3rem;
 			line-height: .3rem;
 			font-size: .14rem;
-			padding: 0 .1rem 0 .22rem;
+			padding: 0 .1rem 0 .22rem !important;
 			// @include bis('~@/assets/images/tag.png');
 			// background-size: .14rem .14rem;
 			// background-position: .06rem center;
 			margin: 0 20px 20px 0!important;
-			span {
-				color: $color;
-			}
-			&:hover{
-				color: #fff!important;
-			}
+			border:1px solid rgba(86, 190, 158, .54);
+			background-color: rgba(88, 191, 159,.05);
+			@include bis('~@/assets/images/tag.png');
+			@include bR(4px);
+			background-size: .14rem .14rem;
+			background-position: .06rem center;
+			color:$color;
 		}
 		.LL-href {
 			width: 100%;
 			height: .3rem;
 			display: inline-block;
+			color:$color;
 		}
 		.zj-button {
 			text-align: center;

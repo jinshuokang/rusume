@@ -24,22 +24,18 @@
         <el-row class="acc-row factory-info"
             v-show="(toData.data.insideResumeQuoteDtoList && toData.data.insideResumeQuoteDtoList.length > 0) || (toData.data.externalResumeQuoteDtoList && toData.data.externalResumeQuoteDtoList.length > 0)"
         >
-            <el-button type="success" class="LL-button" plain
+            <div class="LL-button"
                 v-for="(item, index) in toData.data.insideResumeQuoteDtoList"
                 :key="item.resumeURL + index"
-                @click="hrefClick(item.resumeURL)"
             >
-            <!-- <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a> -->
-                {{item.resumeName}}
-            </el-button>
-            <el-button type="success" class="LL-button" plain
+            <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
+            </div>
+            <div class="LL-button"
                 v-for="(item, index) in toData.data.externalResumeQuoteDtoList"
                 :key="item.resumeURL + index"
-                @click="hrefClick(item.resumeURL)"
             >
-            <!-- <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a> -->
-            {{item.resumeName}}
-            </el-button>
+            <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
+            </div>
         </el-row>
     </el-collapse-item>
 </template>
@@ -52,9 +48,6 @@
             }
         },
         methods: {
-            hrefClick(url) {
-                this.$emit('hrefClick', url)
-            }
         }
     }
 </script>
