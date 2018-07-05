@@ -191,6 +191,7 @@
 				activeNames: [],   // 手风琴 展开项
 				isClick: false,     // 滑动判断的条件
 				moreScrollTop: 0,   // 点击更多获取 滑动距离
+				noModuleArr: [], // 不显示的模块
 				floatInfo:[         // 根据接口动态删除
 					{key: 'QY', nameMap: '企业信息', value: '企业信息', isShow: true}, // isShow 其实可以不要
 					{key: 'ZZ', nameMap: '种植信息', value: '种植信息', isShow: true},
@@ -322,6 +323,7 @@
 									if( val.key == val2.nameMap ) {
 										that.floatInfo.splice(i, 1);
 										i--;
+										that.noModuleArr.push(val2.key);
 									}
 								}
 							}
@@ -344,8 +346,16 @@
 				}
 				//  ----------    这里已经处理好模块的显示与否 floatInfo 中     ------------------------------
 				var list = data.data.resumeList || [];
-				list.forEach( (val, index, arr) => {
+				//list.forEach( (val, index) => {
+				for(var k = list.length - 1; k >= 0; k--){
+					var val = list[k];
+					var index = k;
 					Object.keys(val).forEach( (val2, index2) => {
+						// 这里删除不要的模块
+						if ( that.noModuleArr.indexOf(val2) != -1 ){
+							list.splice(k, 1);
+							return;
+						}
 						 //  数组处理
 						if ( Array.isArray( val[val2] ) ){
 							 for(var i = 0; i < val[val2].length; i++) {
@@ -543,7 +553,7 @@
 						//that.template[val2] = val[val2];
 						Object.assign( that.template[val2], val[val2] );
 					})
-				})
+				}
 				// 这里判断 template 如果内容 就 将 floatInfo 中的 删掉
 				for(var i = 0; i < that.floatInfo.length; i++){
 					var val = that.floatInfo[i];
