@@ -393,6 +393,13 @@
 											 if(val2 == 'ZJ' && val3.key == '检测产品批次'){
 												 val[val2][i]['activeName'] = getModuleType(val3.value);
 											 }
+											 if( val2 == 'ZJ' && val3.key == '检测结果' ) {
+												 if( val3.value == 1 ){
+													 val3.value = '合格';
+												 }else if( val3.value == 2 ) {
+													 val3.value = '不合格';
+												 }
+											 }
 											 // val3.key == 被删除数组 就删掉
 											if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
 												val[val2][i][key].splice(j, 1);
