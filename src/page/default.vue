@@ -8,7 +8,7 @@
 				:span="24"
 				v-for="(item, index) in template.JB.generalEntityList"
 				:key="index">
-				<el-col v-if="item.key == 'IMG'" :span="24" :style="{height:'2rem', overflow:'hidden', marginBottom:'10px'}">
+				<el-col v-if="item.key == 'IMG'" :span="24" :style="{height:'2rem', overflow:'hidden'}">
 					<img :src="item.value" class="acc-img">
 				</el-col>
 			</el-row>
@@ -19,7 +19,7 @@
 		<!-- 内容区域 -->
         <div class="container clearfix" v-show="!moreIsShow">
             <div class="intro">
-                <div class="intro-name">{{name}}</div>
+                <div class="intro-name ellipsis">{{name}}</div>
             </div>
 			<!-- 开始基本信息  -->
             <div class="intro-content clear">
@@ -64,18 +64,21 @@
                 </el-row>
             </div>
 			<!-- 折叠开始 -->
-			<el-collapse @change="handleChange" v-model="activeNames" class="accordion-list">
-				<!-- 企业信息  -->
-				<el-collapse-item
+			<el-collapse id="offsetBegin" @change="handleChange" v-model="activeNames" class="accordion-list">
+				<!-- 种植基本信息  -->
+				<to-gutter :toData="{name:'种植基本信息', class: 'ZZ', activeNames: activeNames,title:{one:'种子基原信息', two:'药材批次信息'}, data: {one:template.ZZ.one, two:template.ZZ.two, all:template.ZZ}}"></to-gutter>
+				<!-- 基地信息  -->
+				<to-gutter :toData="{name:'基地信息', class: 'QY', activeNames: activeNames, title:{one:'', two:'环境信息'}, data: {one:template.QY.generalEntityList, two:template.QY.environmentList, all:template.QY}}">  </to-gutter>
+				<!-- <el-collapse-item
 					class="acc-li"
 					name="QY"
 					id="QY"
 					v-show="template.QY.generalEntityList > 0 || template.QY.environmentList.length > 0"
 					>
 					<template slot="title">
-						<i class="acc-font QY" :class="activeNames.includes('QY')? 'animation': ''"> 企业信息 </i>
+						<i class="acc-font QY" :class="activeNames.includes('QY')? 'animation': ''"> 基地信息 </i>
 					</template>
-					<!-- 企业基本信息 -->
+					
 					<el-row
 						class="acc-row"
 						:class="item.key == 'IMG' ? '' : 'factory-info'"
@@ -91,7 +94,7 @@
 						<span class="env-info-font">环境信息</span>
 						<span class="env-info-line"></span><span class="env-info-pointer"></span>
 					</div>
-					<!-- 环境信息 -->
+					
 					<el-row
 						class="acc-row factory-info"
 						v-show="template.QY.environmentList.length > 0"
@@ -100,17 +103,15 @@
 						<el-col :span="12"><div class="left ellipsis">{{item.key}}</div></el-col>
 						<el-col :span="12"><div class="right ellipsis t">{{item.value}}</div></el-col>
                 	</el-row>
-				</el-collapse-item>
-				<!-- 种植信息  -->
-				<to-base :toData="{name:'种植信息', class: 'ZZ', activeNames: activeNames, data: template.ZZ}"></to-base>
+				</el-collapse-item>-->
 				<!-- 田间信息  -->
 				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames}" @viewMore="viewMore"></to-farm>
 				<!-- 采收管理  -->
 				<to-base :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base>
 				<!-- 初加工  -->
 				<to-base :toData="{name:'初加工信息', activeNames: activeNames, class: 'CJG', data: template.CJG}"></to-base>
-				<!-- 深加工  -->
-				<to-base :toData="{name:'深加工信息', activeNames: activeNames, class: 'SJG', data: template.SJG}"></to-base>
+				<!-- 饮片加工  -->
+				<to-base :toData="{name:'饮片加工信息', activeNames: activeNames, class: 'SJG', data: template.SJG}"></to-base>
 				<!-- 包装信息 -->
 				<to-base :toData="{name:'包装信息', activeNames: activeNames, class: 'BZ', data: template.BZ}"></to-base>
 				<!-- 仓储信息  -->
@@ -167,6 +168,7 @@
 	import { isImg, getParams, getType, throttle, getModuleType, getScrollTop, setScrollTop } from '@/config/mUtils'
 	//import BScroll from 'better-scroll'
 	import toBase from '@/components/common/base'
+	import toGutter from '@/components/common/baseGutter'
 	import toFarm from '@/components/common/farm'
 	import toZj from '@/components/common/zj'
 	import toMore from '@/components/common/more'
@@ -192,13 +194,17 @@
 				isClick: false,     // 滑动判断的条件
 				moreScrollTop: 0,   // 点击更多获取 滑动距离
 				noModuleArr: [], // 不显示的模块
+				zzFloor:{
+					one: ['药材名称', '药材基源', '种苗来源', '药材批次信息'],
+					two: ['种植批次号', '种植面积', '地块编号', '生产时间', '种植标准', '负责人']
+				},
 				floatInfo:[         // 根据接口动态删除
-					{key: 'QY', nameMap: '企业信息', value: '企业信息', isShow: true}, // isShow 其实可以不要
-					{key: 'ZZ', nameMap: '种植信息', value: '种植信息', isShow: true},
+					{key: 'ZZ', nameMap: '种植基本信息', value: '种植基本信息', isShow: true},
+					{key: 'QY', nameMap: '基地信息', value: '基地信息', isShow: true}, // isShow 其实可以不要
 					{key: 'TJ', nameMap: '田间管理', value: '田间管理', isShow: true},
 					{key: 'CS', nameMap: '采收信息', value: '采收信息', isShow: true},
 					{key: 'CJG', nameMap: '加工信息', value: '初加工信息', isShow: true},
-					{key: 'SJG', nameMap: '加工信息', value: '深加工信息', isShow: true},
+					{key: 'SJG', nameMap: '加工信息', value: '饮片加工信息', isShow: true},
 					{key: 'BZ', nameMap: '包装信息', value: '包装信息', isShow: true},
 					{key: 'YCC', nameMap: '仓储信息', value: '原料仓储', isShow: true},
 					{key: 'CCC', nameMap: '仓储信息', value: '成品仓储', isShow: true},
@@ -214,26 +220,26 @@
 					'BZ': [],
 					'YCC': ['仓储内容'],
 					'CCC': ['仓储内容'],
-					'ZJ': [],
+					'ZJ': ['检测产品批次'],
 					'JB': ['产品名称','选择企业']
 				},
 				template: { // lenght == 11  多一个 JB
 				/* 基本内容*/		JB: { authenticationBasicInfoList:[], generalEntityList:[] },
-				/* 企业信息*/		QY: { environmentList: [], generalEntityList: [] },
-				/* 种植信息*/		ZZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 基地信息*/		QY: { environmentList: [], generalEntityList: [] },
+				/* 种植基本信息*/	ZZ: { one:[], two:[], generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 田间管理*/		TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
 				/* 采收信息*/		CS: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 初加工信息*/		CJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 深加工信息*/		SJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 饮片加工信息*/	 SJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 包装信息*/	    BZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 原料仓储信息*/	YCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 成品仓储*/		CCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 质检信息*/		ZJ: [{generalEntityList: [], activeName: ''}],
-				},
+				/* 质检信息*/		ZJ: [{generalEntityList: [], activeName: ''}]
+				}
             }
 		},
 		components: {
-			toBase, toFarm, toZj, toMore
+			toBase, toFarm, toZj, toMore, toGutter
 		},
 		created() {
 			this.loading = this.$loading({text:'拼命加载中...'});
@@ -329,7 +335,7 @@
 							}
 						})
 					}
-					// 	此处 企业的环境信息 与 企业信息 都放入 QY 的 moduleDelete 中
+					// 	此处 基地的环境信息 与 企业信息 都放入 QY 的 moduleDelete 中
 					//  确保这二者中不能有重复的 key 如果有 这里就要改
 					for(var key in data2){
 						if ( !data2[key] || data2[key].length == 0 || !Array.isArray(data2[key])) continue;
@@ -551,13 +557,30 @@
 						}
 						// data 赋值
 						//that.template[val2] = val[val2];
+						// 种植拆分
+						if( val2 == 'ZZ') {
+							if( val[val2].generalEntityList.length > 0){
+								for( let i = 0; i < val[val2].generalEntityList.length; i++){
+									let row = val[val2].generalEntityList[i];
+									if( that.zzFloor.one.includes(row.key) ){
+										that.template['ZZ'].one.push(row)
+									}else if(that.zzFloor.two.includes(row.key)){
+										that.template['ZZ'].two.push(row)
+									}
+									if( row.key == '种苗来源' && row.value.indexOf('外采') != -1){
+										row.value = '外采';
+										that.template['ZZ'].one.push({'外采供应商':'XXX'})
+									}
+								}
+							}
+						}
 						Object.assign( that.template[val2], val[val2] );
 					})
 				}
 				// 这里判断 template 如果内容 就 将 floatInfo 中的 删掉
 				for(var i = 0; i < that.floatInfo.length; i++){
 					var val = that.floatInfo[i];
-					// 企业 特殊处理
+					// 基地信息 特殊处理
 					if( val.key == 'QY' ){
 						if( that.template.QY.environmentList.length == 0 && that.template.QY.generalEntityList == 0 ){
 							that.floatInfo.splice(i, 1);
@@ -648,7 +671,7 @@
 				// 页面滑动距离
 				var scrollTop = getScrollTop();
 				// 元素距离顶部距离
-				let offsetTop = document.querySelector('#QY').offsetTop;
+				let offsetTop = document.querySelector('#offsetBegin').offsetTop;
 				// 页面可视区域高度
 				var clientHeight = document.documentElement.clientHeight;
 				if (scrollTop + (clientHeight / 2) > offsetTop) this.topFloat = true;
