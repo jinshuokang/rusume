@@ -105,7 +105,7 @@
                 	</el-row>
 				</el-collapse-item>-->
 				<!-- 田间信息  -->
-				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames}" @viewMore="viewMore"></to-farm>
+				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames, delete: moduleDelete['TJ']}" @viewMore="viewMore"></to-farm>
 				<!-- 采收管理  -->
 				<to-base :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base>
 				<!-- 初加工  -->
@@ -298,8 +298,6 @@
 				}else {
 					if(datas[0] != 'x') data2 = (datas[0] && datas[0].data.resumeTemplateDetailList) || null;
 				}
-				console.dir(data);
-				console.dir(data2);
 				if( !data || data.code != '0000' ) {
 					that.loading.close();
 					that.$router.push('/404');
@@ -330,6 +328,9 @@
 										that.floatInfo.splice(i, 1);
 										i--;
 										that.noModuleArr.push(val2.key);
+									}
+									if( val.key == '产品信息' ){
+										that.noModuleArr.push('JB');
 									}
 								}
 							}
@@ -502,12 +503,17 @@
 												var imgsArr = [];
 												for(var y = farm.generalEntityList.length - 1; y >= 0 ; y--){
 													var val4 = farm.generalEntityList[y];
-													if(!val4.key || !val4.value){
+													// 	是否显示字段
+													if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val4.key) ){
 														farm.generalEntityList.splice(y, 1);
 														continue;
-													}else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
-														if ( val3.value.indexOf(',') != -1 ){
-															val3.value = val3.value.split(',').join(' ~ ');
+													// key 或 value 为空 就删除这条记录
+													}else if(!val4.key || !val4.value){
+														farm.generalEntityList.splice(y, 1);
+														continue;
+													}else if( val4.hasOwnProperty('key') && (val4.key.indexOf('时间') != -1 || val4.key.indexOf('日期') != -1 ) ){
+														if( val4.value.indexOf(',') != -1 ){
+															val4.value = val4.value.split(',').join(' ~ ');
 														}
 													}
 													if( isImg (val4.value) ){

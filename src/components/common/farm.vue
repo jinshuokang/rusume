@@ -34,10 +34,10 @@
                     src="~@/assets/images/no-img.png"/>
               </div>
               <div class="txt-flow">
-                {{toData.data2[0].generalEntityList[0].value}}
+                {{(toData.data2[0].generalEntityList[0].key == "农事类型" && !toData.delete.includes('农事类型')) ? toData.data2[0].generalEntityList[0].value : ''}}
                 <span @click="viewMore(0)">更多》</span>
                 <br/>
-                <p class="txt-date">{{toData.data2[0].generalEntityList[1].value.split(' ')[0]}}</p>
+                <p class="txt-date">{{(toData.data2[0].generalEntityList[1].key == "操作时间" && !toData.delete.includes('操作时间')) ? toData.data2[0].generalEntityList[1].value.split(' ')[0] : ''}}</p>
               </div>
             </div>
           </div>
@@ -54,10 +54,10 @@
                     src="~@/assets/images/no-img.png"/>
               </div>
               <div class="txt-flow">
-                {{toData.data2[0].generalEntityList[0].value}}
+                {{(toData.data2[0].generalEntityList[0].key == "农事类型" && !toData.delete.includes('农事类型')) ? toData.data2[0].generalEntityList[0].value : ''}}
                 <span @click="viewMore(0)">更多》</span>
                 <br/>
-                <p class="txt-date">{{toData.data2[0].generalEntityList[1].value.split(' ')[0]}}</p>
+                <p class="txt-date">{{(toData.data2[0].generalEntityList[1].key == "操作时间" && !toData.delete.includes('操作时间')) ? toData.data2[0].generalEntityList[1].value.split(' ')[0] : ''}}</p>
               </div>
             </div>
           </div>
@@ -73,10 +73,10 @@
                       src="~@/assets/images/no-img.png"/>
                 </div>
                 <div class="txt-flow">
-                  {{toData.data2.slice(1)[index].generalEntityList[0].value}}
+                  {{(toData.data2.slice(1)[index].generalEntityList[0].key == "农事类型" && !toData.delete.includes('农事类型') ) ? toData.data2.slice(1)[index].generalEntityList[0].value : ''}}
                   <span @click="viewMore(index + 1)">更多》</span>
                   <br/>
-                  <p class="txt-date">{{ toData.data2.slice(1)[index].generalEntityList[1].value.split(' ')[0] }}</p>
+                  <p class="txt-date">{{(toData.data2.slice(1)[index].generalEntityList[1].key == "操作时间" && !toData.delete.includes('操作时间')) ? toData.data2.slice(1)[index].generalEntityList[1].value.split(' ')[0] : ''}}</p>
                 </div>
               </div>
             </div>
@@ -90,10 +90,10 @@
                       src="~@/assets/images/no-img.png"/>
                 </div>
                 <div class="txt-flow">
-                  {{toData.data2.slice(1)[index].generalEntityList[0].value}}
+                  {{(toData.data2.slice(1)[index].generalEntityList[0].key == "农事类型" && !toData.delete.includes('农事类型') ) ? toData.data2.slice(1)[index].generalEntityList[0].value : ''}}
                   <span @click="viewMore(index + 1)">更多》</span>
                   <br/>
-                  <p class="txt-date">{{ toData.data2.slice(1)[index].generalEntityList[1].value.split(' ')[0] }}</p>
+                  <p class="txt-date">{{(toData.data2.slice(1)[index].generalEntityList[1].key == "操作时间" && !toData.delete.includes('操作时间')) ? toData.data2.slice(1)[index].generalEntityList[1].value.split(' ')[0] : ''}}</p>
                 </div>
               </div>
             </div>
