@@ -542,9 +542,7 @@
 									}
 									if( isImg (val3.value) ){
 										var deleteArr = val[val2][key].splice(j, 1);
-										if( val3.key == '企业logo' ){
-											that.logo = val3.value;
-										}else if( val3.key == '基地logo' ){
+										if( val3.key == '基地logo' ){
 											that.farmLogo = val3.value;
 										}else{
 											var imgsOne = deleteArr[0].value.split(',');
@@ -594,6 +592,9 @@
 							}
 							if(val[val2].batchNumber){
 								val[val2].generalEntityList.unshift({key: '生产批号', value: val[val2].batchNumber})
+							}
+							if(val[val2].logoImgUrl){
+								if(isImg (val[val2].logoImgUrl)) that.logo = val[val2].logoImgUrl;
 							}
 						}
 						Object.assign( that.template[val2], val[val2] );
