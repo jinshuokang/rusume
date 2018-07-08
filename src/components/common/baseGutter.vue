@@ -48,8 +48,8 @@
             v-show="toData.data.two.length > 0"
             v-for="item in toData.data.two"
             :key="item.key">
-            <el-col :span="12"><div class="left ellipsis">{{item.key}}</div></el-col>
-            <el-col :span="12"><div class="right ellipsis t">{{item.value}}</div></el-col>
+            <el-col :span="12"><div class="left">{{item.key}}</div></el-col>
+            <el-col :span="12"><div class="right t">{{item.value}}</div></el-col>
         </el-row>
     <to-links :toRusume="{data: toData.data.all}"></to-links>
     </el-collapse-item>

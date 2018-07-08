@@ -195,7 +195,7 @@
 				moreScrollTop: 0,   // 点击更多获取 滑动距离
 				noModuleArr: [], // 不显示的模块
 				zzFloor:{
-					one: ['药材名称', '药材基源', '种苗来源', '药材批次信息'],
+					one: ['药材名称', '药材基原','药用部位','种苗来源','种苗供应商'],
 					two: ['种植批次号', '种植面积', '地块编号', '生产时间', '种植标准', '负责人']
 				},
 				floatInfo:[         // 根据接口动态删除
@@ -215,11 +215,11 @@
 					'ZZ': [],
 					'TJ': [],
 					'CS': [],
-					'CJG': ['加工类型'],
-					'SJG': ['加工类型'],
-					'BZ': [],
-					'YCC': ['仓储内容'],
-					'CCC': ['仓储内容'],
+					'CJG': ['加工类型', '对应批次号'],
+					'SJG': ['加工类型', '对应批次号'],
+					'BZ': ['对应批次号'],
+					'YCC': ['仓储内容', '对应批次号'],
+					'CCC': ['仓储内容', '对应批次号'],
 					'ZJ': ['检测产品批次'],
 					'JB': ['产品名称','选择企业']
 				},
@@ -574,9 +574,9 @@
 									}else if(that.zzFloor.two.includes(row.key)){
 										that.template['ZZ'].two.push(row)
 									}
-									if( row.key == '种苗来源' && row.value.indexOf('外采') != -1){
-										row.value = '外采';
-										that.template['ZZ'].one.push({'外采供应商':'XXX'})
+									if( row.key == '种苗来源'){
+										if(row.value == 2) row.value = '外采';
+										else row.value = '自繁';
 									}
 								}
 							}
