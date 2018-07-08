@@ -312,6 +312,11 @@
 					'ZJ': ['检测产品批次'],
 					'JB': ['产品名称','选择企业']
 				};
+				that.template = {
+					JB: { authenticationBasicInfoList:[], generalEntityList:[] },
+					TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
+					ZJ: [{generalEntityList: [], activeName: ''}]
+				};
 				//end
 				window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
 				//获取 url 参数
@@ -400,7 +405,7 @@
 									// }
 									for(let key in that.floatInfoDelete){
 										if( val.key == that.floatInfoDelete[key]){
-											that.noModuleArr.push(val2.key);
+											that.noModuleArr.push(key);
 										}
 										if( val.key == '产品信息' ){
 											that.noModuleArr.push('JB');
@@ -930,6 +935,8 @@
                 @include center();
                 color: $color;
                 font-weight: bold;
+				width: 2rem;
+				text-align: center;
             }
         }
         .bg-connect {
