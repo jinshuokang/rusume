@@ -297,8 +297,8 @@
 				that.ZJactive = 0;
 				that.active = '';
 				that.moreData = [];
-				that.noModuleArr = [];
-				that.floatInfo = [];
+				that.noModuleArr = []; // 待删除的 模块
+				that.floatInfo = []; // 重置数据
 				that.moduleDelete = { // 待删除的 key
 					'QY': [],
 					'ZZ': [],
@@ -312,7 +312,7 @@
 					'ZJ': ['检测产品批次'],
 					'JB': ['产品名称','选择企业']
 				};
-				that.template = {
+				that.template = { // 重置数据
 					JB: { authenticationBasicInfoList:[], generalEntityList:[] },
 					TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
 					ZJ: [{generalEntityList: [], activeName: ''}]
