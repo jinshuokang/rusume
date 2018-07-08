@@ -495,11 +495,11 @@
 											if( !val3.resumeName  || !val3.resumeURL ){
 												val[val2][key].splice(j, 1);
 												continue;
-											}else {
-												if( !val3.resumeName  || !val3.resumeCode ){
-													val[val2][key].splice(j, 1);
-													continue;
-												}
+											}
+										}else{
+											if( !val3.resumeName  || !val3.resumeCode ){
+												val[val2][key].splice(j, 1);
+												continue;
 											}
 										}
 										// 田间管理单独处理
