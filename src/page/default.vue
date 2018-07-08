@@ -2,7 +2,7 @@
     <div id="home" :style="type=='pc'?'maxWidth:375px':''">
 		<!-- 顶部图片  -->
         <div class="head-img" v-show="!moreIsShow">
-			<img :src="logo" alt="">
+			<img :src="logo" alt="" v-show="template.JB.generalEntityList.length > 0 && template.JB.generalEntityList[0].key == 'IMG'">
             <el-row :class="item.key == 'IMG' ? '' : 'factory-info'"
 				v-if="item.key == 'IMG'"
 				:span="24"
@@ -157,7 +157,7 @@
 		</div>
 		<!-- 树更多弹出 -->
 		<to-more
-			:toData="{data: moreData, show: moreIsShow}"
+			:toData="{data: moreData, show: moreIsShow, logo: farmLogo}"
 			@closeMore="closeMore">
 		</to-more>
     </div>
@@ -179,6 +179,7 @@
 				type:'', // PC or Mobile
 				loading: '',    // 加载中......
 				logo: '',
+				farmLogo: '', //田间管理 logo
 				code: '*********', // 溯源码
                 name: 'XXXX',       // 名称
 				thirdActive: 0, // 第三方显示
@@ -244,7 +245,6 @@
 		created() {
 			this.loading = this.$loading({text:'拼命加载中...'});
 			this.type = getType();
-			console.log(this);
 		},
 		mounted() {
 			var that = this;
@@ -544,6 +544,8 @@
 										var deleteArr = val[val2][key].splice(j, 1);
 										if( val3.key == '企业logo' ){
 											that.logo = val3.value;
+										}else if( val3.key == '基地logo' ){
+											that.farmLogo = val3.value;
 										}else{
 											var imgsOne = deleteArr[0].value.split(',');
 											imgsArr = imgsArr.concat(imgsOne);
@@ -579,6 +581,19 @@
 										else row.value = '自繁';
 									}
 								}
+							}
+						}else if(val2 == 'JB'){
+							if(val[val2].enterpriseName){
+								val[val2].generalEntityList.push({key: '生产企业', value: val[val2].enterpriseName})
+							}
+							if(val[val2].address){
+								val[val2].generalEntityList.push({key: '生产地址', value: val[val2].address})
+							}
+							if(val[val2].description){
+								val[val2].generalEntityList.push({key: '企业简介', value: val[val2].description})
+							}
+							if(val[val2].batchNumber){
+								val[val2].generalEntityList.unshift({key: '生产批号', value: val[val2].batchNumber})
 							}
 						}
 						Object.assign( that.template[val2], val[val2] );

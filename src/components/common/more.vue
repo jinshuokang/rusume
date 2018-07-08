@@ -3,9 +3,10 @@
     <div class="more-model" v-show="toData.show">
         <div class="more-content">
             <el-row class="more-header" @click="closeMore">
-                <span @click="closeMore">X</span>
+                <span @click="closeMore">x</span>
                 <span @click="closeMore">关闭</span>
             </el-row>
+            <img :src="toData.logo" alt="" v-show="toData.data.generalEntityList && toData.data.generalEntityList[0].key == 'IMG'">
             <el-row
                 class="acc-row"
                 :class="item.key == 'IMG' ? '' : 'factory-info'"
@@ -54,10 +55,19 @@
             margin: 30px auto;
             padding: .2rem;
             border-radius: 8px;
+            position: relative;
+            >img {
+			position: absolute;
+			top: .6rem;
+			left: .3rem;
+			width: .5rem;
+			z-index:999;
+		}
         }
         .more-header{
             width:.7rem;
             height:.3rem;
+            line-height: .3rem;
             font-size:.16rem;
             color:#666;
             text-align: left;
