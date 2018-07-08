@@ -247,414 +247,10 @@
 			this.type = getType();
 		},
 		watch:{
-			"$route": function(){
-				this.$router.go(0);
-			}
+			"$route": "reload"
 		},
 		mounted() {
-			var that = this;
-			window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
-			//获取 url 参数
-			const params = getParams(window.location.hash.split('?')[1]);
-			var promiseAll = null;
-			//   真正上线 打开这个
-			if( JSON.stringify(params) == '{}' ){
-				//	关闭加载中
-				setTimeout( () => {
-					that.loading.close();
-					that.$router.push('/404');
-				}, 10);
-				return;
-			}
-			that.resumeCode = params.resumeCode;
-			// params.resumeCode = params.resumeCode == undefined ? that.resumeCode : params.resumeCode;
-			// params.templateCode = params.templateCode == undefined ? that.templateCode : params.templateCode;
-			if( params.templateCode ){ // 预览
-				if( params.resumeCode == 'XXXXXXXXXXXXXXXXXXXX' || !params.resumeCode ) {
-					promiseAll = () => {
-						return	Promise.all( [ 'x', fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
-					}
-				}else {
-					promiseAll = () => {
-						return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}), fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
-					}
-				}
-			}else { // 扫码
-				if( params.resumeCode == 'XXXXXXXXXXXXXXXXXXXX' || !params.resumeCode ){
-					promiseAll = () => {
-						return	Promise.all( [ 'x' ] );
-					}
-				}else {
-					promiseAll = () => {
-						return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}) ] );
-					}
-				}
-			}
-			promiseAll().then( (datas) => {
-				var data = datas[0];
-				// 如果为空或者20个 x  则使用固定数据;
-				if( data == 'x' ) {
-					data = '{"code":"0000","message":"访问成功","data":{"resumeList":[{"JB":{"generalEntityList":[{"key":"产品名称","value":"丹参饮片","type":1},{"key":"基原名称","value":"唇形科植物丹参SalviamiltiorrhizaBge.","type":1},{"key":"部位","value":"根","type":1},{"key":"规格","value":"片","type":1},{"key":"生产模式","value":"半自动化生产","type":7},{"key":"生产标准","value":"无公害标准","type":1},{"key":"简要介绍","value":"活血祛瘀，通经止痛，清心除烦，凉血消痈。用于胸痹心痛，脘腹胁痛，瘕瘕积聚，热痹疼痛，心烦不眠，月经不调，痛经经闭，疮疡肿痛。","type":1},{"key":"企业名称","value":"QY-20180705-000002","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180705/15307736319153e63b.jpg","type":1}],"authenticationBasicInfoList":[{"authenticationName":"绿色中药认证","companyName":"绿色中药标准办公室"},{"authenticationName":"药品GMP认证","companyName":"北京康XX华咨询服务有限公司"}]}},{"QY":{"generalEntityList":[{"key":"企业名称","value":"上药华宇（平邑）中药资源有限公司","type":1},{"key":"企业位置","value":"山东临沂市平邑县","type":1},{"key":"统一社会信用代码","value":"91110117696389412O","type":1},{"key":"负责人","value":"谈景福","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/153050147042089c9c.jpg,http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530501493021273c9.jpg","type":1},{"key":"企业logo","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530499683909bcad7.png","type":1}],"environmentList":[{"key":"使用水源","value":"池塘水,农业设施用水,自然降雨","type":1},{"key":"地形","value":"丘陵","type":1},{"key":"海拔","value":"100M","type":1},{"key":"土壤类型","value":"沙壤土","type":1},{"key":"土壤酸碱度","value":"弱碱性","type":1},{"key":"气候类型","value":"亚热带季风气候","type":1},{"key":"年降雨量","value":"1111mm","type":1},{"key":"年平均温度","value":"20℃","type":1}]}},{"TJ":{"generalEntityList":[{"key":"农事展示时段","value":"2018-06-07,2018-07-26","type":5},{"key":"种植批次号","value":"ZZ-20180702-000008","type":1}],"fieldManageFarmingList":[{"generalEntityList":[{"key":"农事类型","value":"cs农事类型","type":1},{"key":"操作时间","value":"2018-07-02","type":4},{"key":"投入品","value":"cs投入品","type":1},{"key":"投入设备","value":"cs投入设备","type":1},{"key":"农事内容","value":"cs农事内容","type":1},{"key":"负责人","value":"cs负责人","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530511231809c2a9c.png","type":1}]}]}},{"ZZ":{"generalEntityList":[{"key":"种植面积","value":"cs种植面积1234305 m","type":1},{"key":"种植批次号","value":"zz20180702001","type":1},{"key":"地块编号","value":"DK20180702001","type":1},{"key":"生产时间","value":"2018-07-02","type":4},{"key":"种植标准","value":"CS种植标准","type":1},{"key":"负责人","value":"cs负责人","type":1}],"insideResumeQuoteDtoList":[{"resumeCode":"LL-20180702-000004","resumeType":1,"resumeName":"铁棍山药1","resumeURL":""},{"resumeCode":"LL-20180702-000006","resumeType":1,"resumeName":"测试——产品名称","resumeURL":""}],"externalResumeQuoteDtoList":[]}},{"CS":{"generalEntityList":[{"key":"采收批次号","value":"CS20180702002","type":1},{"key":"种植批次号","value":"ZZ-20180702-000008","type":1},{"key":"采收数量","value":"cs采收数量","type":2},{"key":"采收时间","value":"2018-07-02","type":4},{"key":"采收方式","value":"cs采收方式","type":1},{"key":"负责人","value":"cs负责人","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/153051138563362999.png","type":1}],"insideResumeQuoteDtoList":[{"resumeCode":"LL-20180702-000006","resumeType":1,"resumeName":"测试——产品名称","resumeURL":""}],"externalResumeQuoteDtoList":[],"correspondingCode":"ZZ-20180702-000008"}},{"SJG":{"generalEntityList":[{"key":"加工批次号","value":"JG20180702003","type":1},{"key":"对应批次号","value":"CS-20180702-000007","type":1},{"key":"加工类型","value":"2","type":1},{"key":"加工数量","value":"CS加工数量","type":2},{"key":"加工工艺","value":"CS加工数量","type":1},{"key":"操作时间","value":"2018-07-02","type":4},{"key":"负责人","value":"CS负责人","type":1},{"key":"辅料信息","value":"CS辅料信息","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530511665038b70c0.png","type":1}],"insideResumeQuoteDtoList":[],"externalResumeQuoteDtoList":[],"correspondingCode":"CS-20180702-000007"}},{"BZ":{"generalEntityList":[{"key":"包装批次号","value":"BZ201807020006","type":1},{"key":"对应批次号","value":"SJG-20180702-000004","type":1},{"key":"包装方式","value":"cs.   包 装方. 式","type":1},{"key":"包装日期","value":"2018-07-02 14:09,2018-07-02 14:09","type":6},{"key":"包装数量","value":"cs包装数量","type":2},{"key":"负责人","value":"cs负责人","type":1},{"key":"包装规格","value":"cs包装规格","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/15305118258871e17b.png","type":1}],"insideResumeQuoteDtoList":[],"externalResumeQuoteDtoList":[],"correspondingCode":"SJG-20180702-000004"}}],"resumeTemplateDetailList":null}}';
-					data = JSON.parse( data );
-				}
-				var data2 = null;
-				if( params.templateCode ) {
-					data2 = (datas[1] && datas[1].data) || null;
-				}else {
-					if(datas[0] != 'x') data2 = (datas[0] && datas[0].data.resumeTemplateDetailList) || null;
-				}
-				if( !data || data.code != '0000' ) {
-					that.loading.close();
-					that.$router.push('/404');
-				}
-
-				var moduleMap = {};
-				// 首先 过滤出所有 type 为2的 key 放入 moduleDelete
-				if( data2 != null && JSON.stringify(data2) != '{}' ){
-					moduleMap = {
-						// moduleFields: 'ALL',
-						enterpriseInfoDataDto: 'QY', environmentDataDto: 'QY',
-						fieldManageDataDto: 'TJ',
-						packingInfoDataDto: 'BZ',
-						plantDataDto: 'ZZ',
-						processInfoDataDto: 'CJG,SJG',
-						qualityInfoDataDto: 'ZJ',
-						recoveryInfoDataDto: 'CS',
-						warehouseInfoDataDto: 'YCC,CCC',
-						basicDataDto:'JB'
-					};
-					// 大的模块显不显示 floatInfo.isShow
-					if ( data2['moduleFields'] && data2['moduleFields'].length > 0 ){
-						data2['moduleFields'].forEach( (val, index) => {
-							if( val.value == 2) {
-								for( let i = 0; i < that.floatInfo.length; i++ ){
-									var val2 = that.floatInfo[i];
-									if( val.key == val2.nameMap ) {
-										that.floatInfo.splice(i, 1);
-										i--;
-										that.noModuleArr.push(val2.key);
-									}
-									if( val.key == '产品信息' ){
-										that.noModuleArr.push('JB');
-									}
-								}
-							}
-						})
-					}
-					// 	此处 基地的环境信息 与 企业信息 都放入 QY 的 moduleDelete 中
-					//  确保这二者中不能有重复的 key 如果有 这里就要改
-					for(var key in data2){
-						if ( !data2[key] || data2[key].length == 0 || !Array.isArray(data2[key])) continue;
-						data2[key].forEach( (val, index) => {
-							if( val.value == 2 && moduleMap[key]){
-								var modules = moduleMap[key].split(','); // QY BZ 等等
-								that.moduleDelete[modules[0]].push(val.key);
-								if( modules[1] ){
-									that.moduleDelete[modules[1]].push(val.key)
-								}
-							}
-						} )
-					}
-				}
-				//  ----------    这里已经处理好模块的显示与否 floatInfo 中     ------------------------------
-				var list = data.data.resumeList || [];
-				//list.forEach( (val, index) => {
-				for(var k = list.length - 1; k >= 0; k--){
-					var val = list[k];
-					var index = k;
-					Object.keys(val).forEach( (val2, index2) => {
-						// 这里删除不要的模块
-						if ( that.noModuleArr.indexOf(val2) != -1 ){
-							list.splice(k, 1);
-							return;
-						}
-						 //  数组处理
-						if ( Array.isArray( val[val2] ) ){
-							 for(var i = 0; i < val[val2].length; i++) {
-								 if( !val[val2][i] ){
-									 val[val2].splice(i, 1);
-									 i--;
-								 }else{
-									for(var key in val[val2][i]){
-										 if( !val[val2][i][key] ) {
-											 delete val[val2][i][key];
-											 continue;
-										 }
-										// 如果 '展示引用履历' 为真 则删掉 externalResumeQuoteDtoList && insideResumeQuoteDtoList
-										 if( that.moduleDelete[val2] && that.moduleDelete[val2].includes('展示引用履历') ){
-											if( key == 'externalResumeQuoteDtoList' ) {
-												delete val[val2][i][key];
-												continue;
-											}
-											if( key == 'insideResumeQuoteDtoList') {
-												delete val[val2][i][key];
-												continue;
-											}
-										}
-										 var imgsArr = [];
-										 if( !Array.isArray(val[val2][i][key]) ) continue;
-										 for( var j = val[val2][i][key].length - 1; j >= 0; j--){
-											 var val3 = val[val2][i][key][j];
-											 // 构造质检信息 Tab
-											 if(val2 == 'ZJ' && val3.key == '检测产品批次'){
-												 val[val2][i]['activeName'] = getModuleType(val3.value);
-											 }
-											 if( val2 == 'ZJ' && val3.key == '检测结果' ) {
-												 if( val3.value == 1 ){
-													 val3.value = '合格';
-												 }else if( val3.value == 2 ) {
-													 val3.value = '不合格';
-												 }
-											 }
-											 // val3.key == 被删除数组 就删掉
-											if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
-												val[val2][i][key].splice(j, 1);
-												continue;
-											}
-											// 履历链接处理
-											if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
-												if(key == 'externalResumeQuoteDtoList') {
-													if( !val3.resumeName  || !val3.resumeURL ){
-														val[val2][i][key].splice(j, 1);
-														continue;
-													}
-												}else {
-													if( !val3.resumeName  || !val3.resumeCode ){
-														val[val2][i][key].splice(j, 1);
-														continue;
-													}
-												}
-											}
-											 //  key 或 value 为空 就删除这条记录
-											 // TODO:
-											 if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
-												 val[val2][i][key].splice(j, 1);
-												 continue;
-											 }else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
-												if ( val3.value.indexOf(',') != -1 ){
-													val3.value = val3.value.split(',').join(' ~ ');
-												}
-											}
-											 if( isImg (val3.value) ){
-												var deleteArr = val[val2][i][key].splice(j, 1);
-												var imgsOne = deleteArr[0].value.split(',');
-												imgsArr = imgsArr.concat(imgsOne);
-											 }
-										 }
-										 // 去重
-										 imgsArr = imgsArr.filter( (val0,index0,arr0) => {
-											return arr0.indexOf(val0) == index0;
-										 })
-										 // 循环结束 unshift 图片
-										 for( let z = imgsArr.length - 1; z >= 0; z-- ){
-											val[val2][i][key].unshift({key:'IMG', value: imgsArr[z]});
-										 }
-									 }
-								 }
-							 }
-						}
-						// 对象处理
-						if( Object.prototype.toString.call( val[val2] ) == '[object Object]' ){
-							for( var key in val[val2] ) {
-								if( !val[val2][key] || val[val2][key].length == 0 ){
-									delete val[val2][key]
-									continue;
-								}
-								if( !Array.isArray(val[val2][key]) ) continue;
-								var imgsArr = [];
-								// JB 基本信息在这里删除 TODO:
-								if(val2 == 'JB'){
-									if( key == 'authenticationBasicInfoList' &&  that.moduleDelete[val2] && that.moduleDelete[val2].includes('第三方认证') ){
-										delete val[val2][key];
-										continue;
-									}
-								}
-								// 如果 '展示引用履历' 为真 则删掉 externalResumeQuoteDtoList && insideResumeQuoteDtoList
-								if( that.moduleDelete[val2] && that.moduleDelete[val2].includes('展示引用履历') ){
-									if( key == 'externalResumeQuoteDtoList' ) {
-										delete val[val2][key];
-										continue;
-									}
-									if( key == 'insideResumeQuoteDtoList') {
-										delete val[val2][key];
-										continue;
-									}
-								}
-								// 田间管理 拷贝
-								if( val2 == 'TJ' &&  key == 'fieldManageFarmingList' ){
-									that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
-								}
-								for( var j = val[val2][key].length - 1; j >= 0; j--){
-									var val3 = val[val2][key][j];
-									// 履历外链接 单独处理
-									if( val2 == 'JB' &&  val3.key == '产品名称' ){
-										that.name = val3.value || '';
-									}
-									if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
-										if(key == 'externalResumeQuoteDtoList') {
-											if( !val3.resumeName  || !val3.resumeURL ){
-												val[val2][key].splice(j, 1);
-												continue;
-											}
-										}else{
-											if( !val3.resumeName  || !val3.resumeCode ){
-												val[val2][key].splice(j, 1);
-												continue;
-											}
-										}
-										// 田间管理单独处理
-									}else if( val2 == 'TJ' &&  key == 'fieldManageFarmingList'){
-										for( var x = 0; x < val[val2][key].length; x++) {
-											var farm = val[val2][key][x];
-											if( farm.generalEntityList && Array.isArray( farm.generalEntityList )){
-												var imgsArr = [];
-												for(var y = farm.generalEntityList.length - 1; y >= 0 ; y--){
-													var val4 = farm.generalEntityList[y];
-													// 	是否显示字段
-													if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val4.key) ){
-														farm.generalEntityList.splice(y, 1);
-														continue;
-													// key 或 value 为空 就删除这条记录
-													}else if(!val4.key || !val4.value){
-														farm.generalEntityList.splice(y, 1);
-														continue;
-													}else if( val4.hasOwnProperty('key') && (val4.key.indexOf('时间') != -1 || val4.key.indexOf('日期') != -1 ) ){
-														if( val4.value.indexOf(',') != -1 ){
-															val4.value = val4.value.split(',').join(' ~ ');
-														}
-													}
-													if( isImg (val4.value) ){
-														var deleteArr = farm.generalEntityList.splice(y, 1);
-														var imgsOne = deleteArr[0].value.split(',');
-														imgsArr = imgsArr.concat(imgsOne);
-													}
-												}
-												// 去重
-												imgsArr = imgsArr.filter( (val0,index0,arr0) => {
-													return arr0.indexOf(val0) == index0;
-												})
-												// 循环结束 unshift 图片
-												for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
-													farm.generalEntityList.unshift({key:'IMG', value: imgsArr[z]});
-												}
-											}
-										}
-										continue;
-									// 删除字段
-									}else if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
-										val[val2][key].splice(j, 1);
-										continue;
-									// key 或 value 为空 就删除这条记录
-									}else if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
-										val[val2][key].splice(j, 1);
-										continue;
-									}else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
-										if ( val3.value.indexOf(',') != -1 ){
-											val3.value = val3.value.split(',').join(' ~ ');
-										}
-									}
-									if( isImg (val3.value) ){
-										var deleteArr = val[val2][key].splice(j, 1);
-										if( val3.key == '基地logo' ){
-											that.farmLogo = val3.value;
-										}else{
-											var imgsOne = deleteArr[0].value.split(',');
-											imgsArr = imgsArr.concat(imgsOne);
-										}
-									}
-								}
-								// 去重
-								imgsArr = imgsArr.filter( (val0,index0,arr0) => {
-									return arr0.indexOf(val0) == index0;
-								})
-								// 循环结束 unshift 图片     企业 logo 单独处理
-								if( key != 'fieldManageFarmingList' ) {
-									for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
-										val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
-									}
-								}
-							}
-						}
-						// data 赋值
-						//that.template[val2] = val[val2];
-						// 种植拆分
-						if( val2 == 'ZZ') {
-							if( val[val2].generalEntityList.length > 0){
-								for( let i = 0; i < val[val2].generalEntityList.length; i++){
-									let row = val[val2].generalEntityList[i];
-									if( that.zzFloor.one.includes(row.key) ){
-										that.template['ZZ'].one.push(row)
-									}else if(that.zzFloor.two.includes(row.key)){
-										that.template['ZZ'].two.push(row)
-									}
-									if( row.key == '种苗来源'){
-										if(row.value == 2) row.value = '外采';
-										else row.value = '自繁';
-									}
-								}
-							}
-						}else if(val2 == 'JB'){
-							if(val[val2].enterpriseName){
-								val[val2].generalEntityList.push({key: '生产企业', value: val[val2].enterpriseName})
-							}
-							if(val[val2].address){
-								val[val2].generalEntityList.push({key: '生产地址', value: val[val2].address})
-							}
-							if(val[val2].description){
-								val[val2].generalEntityList.push({key: '企业简介', value: val[val2].description})
-							}
-							if(val[val2].batchNumber){
-								val[val2].generalEntityList.unshift({key: '生产批号', value: val[val2].batchNumber})
-							}
-							if(val[val2].logoImgUrl){
-								if(isImg (val[val2].logoImgUrl)) that.logo = val[val2].logoImgUrl;
-							}
-						}
-						Object.assign( that.template[val2], val[val2] );
-					})
-				}
-				// 这里判断 template 如果内容 就 将 floatInfo 中的 删掉
-				for(var i = 0; i < that.floatInfo.length; i++){
-					var val = that.floatInfo[i];
-					// 基地信息 特殊处理
-					if( val.key == 'QY' ){
-						if( that.template.QY.environmentList.length == 0 && that.template.QY.generalEntityList == 0 ){
-							that.floatInfo.splice(i, 1);
-							i--;
-						}
-					// 田间 特殊处理
-					}else if( val.key == 'TJ' ){
-						if ( that.template.TJ.fieldManageFarmingList.length == 0 || that.template.TJ.fieldManageFarmingList[0].generalEntityList.length == 0 ){
-							that.floatInfo.splice(i, 1);
-							i--;
-						}
-					// 质检 特殊处理
-					}else if( val.key == 'ZJ' ){
-						if( that.template.ZJ[0].generalEntityList.length == 0 ) {
-							that.floatInfo.splice(i, 1);
-							i--;
-						}
-					// 其他公共模块
-					}else {
-						if( that.template[val.key].generalEntityList.length == 0 ){
-							that.floatInfo.splice(i, 1);
-							i--;
-						}
-					}
-				}
-
-				//关闭加载中
-				setTimeout( () => {
-					that.loading.close();
-				},10);
-			}).catch( (res) => {
-				//	关闭加载中
-				console.log(res);
-				setTimeout( () => {
-					that.loading.close();
-				},10);
-				that.$router.push('/404');
-			})
+			this.reload();
 		},
         computed: {
 			clientW: function() {
@@ -665,6 +261,412 @@
 			// }
         },
         methods: {
+			reload() {
+				setScrollTop(0);
+				var that = this;
+				window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
+				//获取 url 参数
+				const params = getParams(window.location.hash.split('?')[1]);
+				var promiseAll = null;
+				//   真正上线 打开这个
+				if( JSON.stringify(params) == '{}' ){
+					//	关闭加载中
+					setTimeout( () => {
+						that.loading.close();
+						that.$router.push('/404');
+					}, 10);
+					return;
+				}
+				that.resumeCode = params.resumeCode;
+				// params.resumeCode = params.resumeCode == undefined ? that.resumeCode : params.resumeCode;
+				// params.templateCode = params.templateCode == undefined ? that.templateCode : params.templateCode;
+				if( params.templateCode ){ // 预览
+					if( params.resumeCode == 'XXXXXXXXXXXXXXXXXXXX' || !params.resumeCode ) {
+						promiseAll = () => {
+							return	Promise.all( [ 'x', fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
+						}
+					}else {
+						promiseAll = () => {
+							return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}), fetch('/getTemplateDetail/' + params.templateCode,{}) ] );
+						}
+					}
+				}else { // 扫码
+					if( params.resumeCode == 'XXXXXXXXXXXXXXXXXXXX' || !params.resumeCode ){
+						promiseAll = () => {
+							return	Promise.all( [ 'x' ] );
+						}
+					}else {
+						promiseAll = () => {
+							return	Promise.all( [ fetch('/getDetail/' + params.resumeCode ,{}) ] );
+						}
+					}
+				}
+				promiseAll().then( (datas) => {
+					var data = datas[0];
+					// 如果为空或者20个 x  则使用固定数据;
+					if( data == 'x' ) {
+						data = '{"code":"0000","message":"访问成功","data":{"resumeList":[{"JB":{"generalEntityList":[{"key":"产品名称","value":"丹参饮片","type":1},{"key":"基原名称","value":"唇形科植物丹参SalviamiltiorrhizaBge.","type":1},{"key":"部位","value":"根","type":1},{"key":"规格","value":"片","type":1},{"key":"生产模式","value":"半自动化生产","type":7},{"key":"生产标准","value":"无公害标准","type":1},{"key":"简要介绍","value":"活血祛瘀，通经止痛，清心除烦，凉血消痈。用于胸痹心痛，脘腹胁痛，瘕瘕积聚，热痹疼痛，心烦不眠，月经不调，痛经经闭，疮疡肿痛。","type":1},{"key":"企业名称","value":"QY-20180705-000002","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180705/15307736319153e63b.jpg","type":1}],"authenticationBasicInfoList":[{"authenticationName":"绿色中药认证","companyName":"绿色中药标准办公室"},{"authenticationName":"药品GMP认证","companyName":"北京康XX华咨询服务有限公司"}]}},{"QY":{"generalEntityList":[{"key":"企业名称","value":"上药华宇（平邑）中药资源有限公司","type":1},{"key":"企业位置","value":"山东临沂市平邑县","type":1},{"key":"统一社会信用代码","value":"91110117696389412O","type":1},{"key":"负责人","value":"谈景福","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/153050147042089c9c.jpg,http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530501493021273c9.jpg","type":1},{"key":"企业logo","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530499683909bcad7.png","type":1}],"environmentList":[{"key":"使用水源","value":"池塘水,农业设施用水,自然降雨","type":1},{"key":"地形","value":"丘陵","type":1},{"key":"海拔","value":"100M","type":1},{"key":"土壤类型","value":"沙壤土","type":1},{"key":"土壤酸碱度","value":"弱碱性","type":1},{"key":"气候类型","value":"亚热带季风气候","type":1},{"key":"年降雨量","value":"1111mm","type":1},{"key":"年平均温度","value":"20℃","type":1}]}},{"TJ":{"generalEntityList":[{"key":"农事展示时段","value":"2018-06-07,2018-07-26","type":5},{"key":"种植批次号","value":"ZZ-20180702-000008","type":1}],"fieldManageFarmingList":[{"generalEntityList":[{"key":"农事类型","value":"cs农事类型","type":1},{"key":"操作时间","value":"2018-07-02","type":4},{"key":"投入品","value":"cs投入品","type":1},{"key":"投入设备","value":"cs投入设备","type":1},{"key":"农事内容","value":"cs农事内容","type":1},{"key":"负责人","value":"cs负责人","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530511231809c2a9c.png","type":1}]}]}},{"ZZ":{"generalEntityList":[{"key":"种植面积","value":"cs种植面积1234305 m","type":1},{"key":"种植批次号","value":"zz20180702001","type":1},{"key":"地块编号","value":"DK20180702001","type":1},{"key":"生产时间","value":"2018-07-02","type":4},{"key":"种植标准","value":"CS种植标准","type":1},{"key":"负责人","value":"cs负责人","type":1}],"insideResumeQuoteDtoList":[{"resumeCode":"LL-20180702-000004","resumeType":1,"resumeName":"铁棍山药1","resumeURL":""},{"resumeCode":"LL-20180702-000006","resumeType":1,"resumeName":"测试——产品名称","resumeURL":""}],"externalResumeQuoteDtoList":[]}},{"CS":{"generalEntityList":[{"key":"采收批次号","value":"CS20180702002","type":1},{"key":"种植批次号","value":"ZZ-20180702-000008","type":1},{"key":"采收数量","value":"cs采收数量","type":2},{"key":"采收时间","value":"2018-07-02","type":4},{"key":"采收方式","value":"cs采收方式","type":1},{"key":"负责人","value":"cs负责人","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/153051138563362999.png","type":1}],"insideResumeQuoteDtoList":[{"resumeCode":"LL-20180702-000006","resumeType":1,"resumeName":"测试——产品名称","resumeURL":""}],"externalResumeQuoteDtoList":[],"correspondingCode":"ZZ-20180702-000008"}},{"SJG":{"generalEntityList":[{"key":"加工批次号","value":"JG20180702003","type":1},{"key":"对应批次号","value":"CS-20180702-000007","type":1},{"key":"加工类型","value":"2","type":1},{"key":"加工数量","value":"CS加工数量","type":2},{"key":"加工工艺","value":"CS加工数量","type":1},{"key":"操作时间","value":"2018-07-02","type":4},{"key":"负责人","value":"CS负责人","type":1},{"key":"辅料信息","value":"CS辅料信息","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/1530511665038b70c0.png","type":1}],"insideResumeQuoteDtoList":[],"externalResumeQuoteDtoList":[],"correspondingCode":"CS-20180702-000007"}},{"BZ":{"generalEntityList":[{"key":"包装批次号","value":"BZ201807020006","type":1},{"key":"对应批次号","value":"SJG-20180702-000004","type":1},{"key":"包装方式","value":"cs.   包 装方. 式","type":1},{"key":"包装日期","value":"2018-07-02 14:09,2018-07-02 14:09","type":6},{"key":"包装数量","value":"cs包装数量","type":2},{"key":"负责人","value":"cs负责人","type":1},{"key":"包装规格","value":"cs包装规格","type":1},{"key":"图片","value":"http://img5.farmeasy.cn/acsm-yp/00000001/staff/20180702/15305118258871e17b.png","type":1}],"insideResumeQuoteDtoList":[],"externalResumeQuoteDtoList":[],"correspondingCode":"SJG-20180702-000004"}}],"resumeTemplateDetailList":null}}';
+						data = JSON.parse( data );
+					}
+					var data2 = null;
+					if( params.templateCode ) {
+						data2 = (datas[1] && datas[1].data) || null;
+					}else {
+						if(datas[0] != 'x') data2 = (datas[0] && datas[0].data.resumeTemplateDetailList) || null;
+					}
+					if( !data || data.code != '0000' ) {
+						that.loading.close();
+						that.$router.push('/404');
+					}
+
+					var moduleMap = {};
+					// 首先 过滤出所有 type 为2的 key 放入 moduleDelete
+					if( data2 != null && JSON.stringify(data2) != '{}' ){
+						moduleMap = {
+							// moduleFields: 'ALL',
+							enterpriseInfoDataDto: 'QY', environmentDataDto: 'QY',
+							fieldManageDataDto: 'TJ',
+							packingInfoDataDto: 'BZ',
+							plantDataDto: 'ZZ',
+							processInfoDataDto: 'CJG,SJG',
+							qualityInfoDataDto: 'ZJ',
+							recoveryInfoDataDto: 'CS',
+							warehouseInfoDataDto: 'YCC,CCC',
+							basicDataDto:'JB'
+						};
+						// 大的模块显不显示 floatInfo.isShow
+						if ( data2['moduleFields'] && data2['moduleFields'].length > 0 ){
+							data2['moduleFields'].forEach( (val, index) => {
+								if( val.value == 2) {
+									for( let i = 0; i < that.floatInfo.length; i++ ){
+										var val2 = that.floatInfo[i];
+										if( val.key == val2.nameMap ) {
+											that.floatInfo.splice(i, 1);
+											i--;
+											that.noModuleArr.push(val2.key);
+										}
+										if( val.key == '产品信息' ){
+											that.noModuleArr.push('JB');
+										}
+									}
+								}
+							})
+						}
+						// 	此处 基地的环境信息 与 企业信息 都放入 QY 的 moduleDelete 中
+						//  确保这二者中不能有重复的 key 如果有 这里就要改
+						for(var key in data2){
+							if ( !data2[key] || data2[key].length == 0 || !Array.isArray(data2[key])) continue;
+							data2[key].forEach( (val, index) => {
+								if( val.value == 2 && moduleMap[key]){
+									var modules = moduleMap[key].split(','); // QY BZ 等等
+									that.moduleDelete[modules[0]].push(val.key);
+									if( modules[1] ){
+										that.moduleDelete[modules[1]].push(val.key)
+									}
+								}
+							} )
+						}
+					}
+					//  ----------    这里已经处理好模块的显示与否 floatInfo 中     ------------------------------
+					var list = data.data.resumeList || [];
+					//list.forEach( (val, index) => {
+					for(var k = list.length - 1; k >= 0; k--){
+						var val = list[k];
+						var index = k;
+						Object.keys(val).forEach( (val2, index2) => {
+							// 这里删除不要的模块
+							if ( that.noModuleArr.indexOf(val2) != -1 ){
+								list.splice(k, 1);
+								return;
+							}
+							//  数组处理
+							if ( Array.isArray( val[val2] ) ){
+								for(var i = 0; i < val[val2].length; i++) {
+									if( !val[val2][i] ){
+										val[val2].splice(i, 1);
+										i--;
+									}else{
+										for(var key in val[val2][i]){
+											if( !val[val2][i][key] ) {
+												delete val[val2][i][key];
+												continue;
+											}
+											// 如果 '展示引用履历' 为真 则删掉 externalResumeQuoteDtoList && insideResumeQuoteDtoList
+											if( that.moduleDelete[val2] && that.moduleDelete[val2].includes('展示引用履历') ){
+												if( key == 'externalResumeQuoteDtoList' ) {
+													delete val[val2][i][key];
+													continue;
+												}
+												if( key == 'insideResumeQuoteDtoList') {
+													delete val[val2][i][key];
+													continue;
+												}
+											}
+											var imgsArr = [];
+											if( !Array.isArray(val[val2][i][key]) ) continue;
+											for( var j = val[val2][i][key].length - 1; j >= 0; j--){
+												var val3 = val[val2][i][key][j];
+												// 构造质检信息 Tab
+												if(val2 == 'ZJ' && val3.key == '检测产品批次'){
+													val[val2][i]['activeName'] = getModuleType(val3.value);
+												}
+												if( val2 == 'ZJ' && val3.key == '检测结果' ) {
+													if( val3.value == 1 ){
+														val3.value = '合格';
+													}else if( val3.value == 2 ) {
+														val3.value = '不合格';
+													}
+												}
+												// val3.key == 被删除数组 就删掉
+												if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
+													val[val2][i][key].splice(j, 1);
+													continue;
+												}
+												// 履历链接处理
+												if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
+													if(key == 'externalResumeQuoteDtoList') {
+														if( !val3.resumeName  || !val3.resumeURL ){
+															val[val2][i][key].splice(j, 1);
+															continue;
+														}
+													}else {
+														if( !val3.resumeName  || !val3.resumeCode ){
+															val[val2][i][key].splice(j, 1);
+															continue;
+														}
+													}
+												}
+												//  key 或 value 为空 就删除这条记录
+												// TODO:
+												if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
+													val[val2][i][key].splice(j, 1);
+													continue;
+												}else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
+													if ( val3.value.indexOf(',') != -1 ){
+														val3.value = val3.value.split(',').join(' ~ ');
+													}
+												}
+												if( isImg (val3.value) ){
+													var deleteArr = val[val2][i][key].splice(j, 1);
+													var imgsOne = deleteArr[0].value.split(',');
+													imgsArr = imgsArr.concat(imgsOne);
+												}
+											}
+											// 去重
+											imgsArr = imgsArr.filter( (val0,index0,arr0) => {
+												return arr0.indexOf(val0) == index0;
+											})
+											// 循环结束 unshift 图片
+											for( let z = imgsArr.length - 1; z >= 0; z-- ){
+												val[val2][i][key].unshift({key:'IMG', value: imgsArr[z]});
+											}
+										}
+									}
+								}
+							}
+							// 对象处理
+							if( Object.prototype.toString.call( val[val2] ) == '[object Object]' ){
+								for( var key in val[val2] ) {
+									if( !val[val2][key] || val[val2][key].length == 0 ){
+										delete val[val2][key]
+										continue;
+									}
+									if( !Array.isArray(val[val2][key]) ) continue;
+									var imgsArr = [];
+									// JB 基本信息在这里删除 TODO:
+									if(val2 == 'JB'){
+										if( key == 'authenticationBasicInfoList' &&  that.moduleDelete[val2] && that.moduleDelete[val2].includes('第三方认证') ){
+											delete val[val2][key];
+											continue;
+										}
+									}
+									// 如果 '展示引用履历' 为真 则删掉 externalResumeQuoteDtoList && insideResumeQuoteDtoList
+									if( that.moduleDelete[val2] && that.moduleDelete[val2].includes('展示引用履历') ){
+										if( key == 'externalResumeQuoteDtoList' ) {
+											delete val[val2][key];
+											continue;
+										}
+										if( key == 'insideResumeQuoteDtoList') {
+											delete val[val2][key];
+											continue;
+										}
+									}
+									// 田间管理 拷贝
+									if( val2 == 'TJ' &&  key == 'fieldManageFarmingList' ){
+										that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
+									}
+									for( var j = val[val2][key].length - 1; j >= 0; j--){
+										var val3 = val[val2][key][j];
+										// 履历外链接 单独处理
+										if( val2 == 'JB' &&  val3.key == '产品名称' ){
+											that.name = val3.value || '';
+										}
+										if( key == 'externalResumeQuoteDtoList' || key == 'insideResumeQuoteDtoList'){
+											if(key == 'externalResumeQuoteDtoList') {
+												if( !val3.resumeName  || !val3.resumeURL ){
+													val[val2][key].splice(j, 1);
+													continue;
+												}
+											}else{
+												if( !val3.resumeName  || !val3.resumeCode ){
+													val[val2][key].splice(j, 1);
+													continue;
+												}
+											}
+											// 田间管理单独处理
+										}else if( val2 == 'TJ' &&  key == 'fieldManageFarmingList'){
+											for( var x = 0; x < val[val2][key].length; x++) {
+												var farm = val[val2][key][x];
+												if( farm.generalEntityList && Array.isArray( farm.generalEntityList )){
+													var imgsArr = [];
+													for(var y = farm.generalEntityList.length - 1; y >= 0 ; y--){
+														var val4 = farm.generalEntityList[y];
+														// 	是否显示字段
+														if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val4.key) ){
+															farm.generalEntityList.splice(y, 1);
+															continue;
+														// key 或 value 为空 就删除这条记录
+														}else if(!val4.key || !val4.value){
+															farm.generalEntityList.splice(y, 1);
+															continue;
+														}else if( val4.hasOwnProperty('key') && (val4.key.indexOf('时间') != -1 || val4.key.indexOf('日期') != -1 ) ){
+															if( val4.value.indexOf(',') != -1 ){
+																val4.value = val4.value.split(',').join(' ~ ');
+															}
+														}
+														if( isImg (val4.value) ){
+															var deleteArr = farm.generalEntityList.splice(y, 1);
+															var imgsOne = deleteArr[0].value.split(',');
+															imgsArr = imgsArr.concat(imgsOne);
+														}
+													}
+													// 去重
+													imgsArr = imgsArr.filter( (val0,index0,arr0) => {
+														return arr0.indexOf(val0) == index0;
+													})
+													// 循环结束 unshift 图片
+													for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
+														farm.generalEntityList.unshift({key:'IMG', value: imgsArr[z]});
+													}
+												}
+											}
+											continue;
+										// 删除字段
+										}else if( that.moduleDelete[val2] && that.moduleDelete[val2].includes(val3.key) ){
+											val[val2][key].splice(j, 1);
+											continue;
+										// key 或 value 为空 就删除这条记录
+										}else if( (val3.hasOwnProperty('key') && !val3.key) || (val3.hasOwnProperty('value') && !val3.value ) ){
+											val[val2][key].splice(j, 1);
+											continue;
+										}else if( val3.hasOwnProperty('key') && (val3.key.indexOf('时间') != -1 || val3.key.indexOf('日期') != -1 ) ){
+											if ( val3.value.indexOf(',') != -1 ){
+												val3.value = val3.value.split(',').join(' ~ ');
+											}
+										}
+										if( isImg (val3.value) ){
+											var deleteArr = val[val2][key].splice(j, 1);
+											if( val3.key == '基地logo' ){
+												that.farmLogo = val3.value;
+											}else{
+												var imgsOne = deleteArr[0].value.split(',');
+												imgsArr = imgsArr.concat(imgsOne);
+											}
+										}
+									}
+									// 去重
+									imgsArr = imgsArr.filter( (val0,index0,arr0) => {
+										return arr0.indexOf(val0) == index0;
+									})
+									// 循环结束 unshift 图片     企业 logo 单独处理
+									if( key != 'fieldManageFarmingList' ) {
+										for( let z = imgsArr.length - 1; z >= 0 ; z-- ){
+											val[val2][key].unshift({key:'IMG', value: imgsArr[z]});
+										}
+									}
+								}
+							}
+							// data 赋值
+							//that.template[val2] = val[val2];
+							// 种植拆分
+							if( val2 == 'ZZ') {
+								if( val[val2].generalEntityList.length > 0){
+									for( let i = 0; i < val[val2].generalEntityList.length; i++){
+										let row = val[val2].generalEntityList[i];
+										if( that.zzFloor.one.includes(row.key) ){
+											that.template['ZZ'].one.push(row)
+										}else if(that.zzFloor.two.includes(row.key)){
+											that.template['ZZ'].two.push(row)
+										}
+										if( row.key == '种苗来源'){
+											if(row.value == 2) row.value = '外采';
+											else row.value = '自繁';
+										}
+									}
+								}
+							}else if(val2 == 'JB'){
+								if(val[val2].enterpriseName){
+									val[val2].generalEntityList.push({key: '生产企业', value: val[val2].enterpriseName})
+								}
+								if(val[val2].address){
+									val[val2].generalEntityList.push({key: '生产地址', value: val[val2].address})
+								}
+								if(val[val2].description){
+									val[val2].generalEntityList.push({key: '企业简介', value: val[val2].description})
+								}
+								if(val[val2].batchNumber){
+									val[val2].generalEntityList.unshift({key: '生产批号', value: val[val2].batchNumber})
+								}
+								if(val[val2].logoImgUrl){
+									if(isImg (val[val2].logoImgUrl)) that.logo = val[val2].logoImgUrl;
+								}
+							}
+							Object.assign( that.template[val2], val[val2] );
+						})
+					}
+					// 这里判断 template 如果内容 就 将 floatInfo 中的 删掉
+					for(var i = 0; i < that.floatInfo.length; i++){
+						var val = that.floatInfo[i];
+						// 基地信息 特殊处理
+						if( val.key == 'QY' ){
+							if( that.template.QY.environmentList.length == 0 && that.template.QY.generalEntityList == 0 ){
+								that.floatInfo.splice(i, 1);
+								i--;
+							}
+						// 田间 特殊处理
+						}else if( val.key == 'TJ' ){
+							if ( that.template.TJ.fieldManageFarmingList.length == 0 || that.template.TJ.fieldManageFarmingList[0].generalEntityList.length == 0 ){
+								that.floatInfo.splice(i, 1);
+								i--;
+							}
+						// 质检 特殊处理
+						}else if( val.key == 'ZJ' ){
+							if( that.template.ZJ[0].generalEntityList.length == 0 ) {
+								that.floatInfo.splice(i, 1);
+								i--;
+							}
+						// 其他公共模块
+						}else {
+							if( that.template[val.key].generalEntityList.length == 0 ){
+								that.floatInfo.splice(i, 1);
+								i--;
+							}
+						}
+					}
+
+					//关闭加载中
+					setTimeout( () => {
+						that.loading.close();
+					},10);
+				}).catch( (res) => {
+					//	关闭加载中
+					console.log(res);
+					setTimeout( () => {
+						that.loading.close();
+					},10);
+					that.$router.push('/404');
+				})
+			},
 			// 树苗更多点击
 			viewMore(index){
 				this.moreScrollTop = getScrollTop();
