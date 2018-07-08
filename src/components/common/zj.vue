@@ -19,7 +19,8 @@
                 v-for="(item, index) in toData.data.insideResumeQuoteDtoList"
                 :key="item.resumeURL + index"
             >
-                <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a>
+                <!-- <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a> -->
+                <router-link class="LL-href" :to="{name: 'default', query:{ resumeCode: item.resumeCode }}">{{item.resumeName}}</router-link>
             </div>
             <div class="LL-button"
                 v-for="(item, index) in toData.data.externalResumeQuoteDtoList"

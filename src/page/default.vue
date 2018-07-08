@@ -200,7 +200,7 @@
 					two: ['种植批次号', '种植面积', '地块编号', '生产时间', '种植标准', '负责人']
 				},
 				floatInfo:[         // 根据接口动态删除
-					{key: 'ZZ', nameMap: '种植基本信息', value: '种植基本信息', isShow: true},
+					{key: 'ZZ', nameMap: '种植信息', value: '种植基本信息', isShow: true},
 					{key: 'QY', nameMap: '基地信息', value: '基地信息', isShow: true}, // isShow 其实可以不要
 					{key: 'TJ', nameMap: '田间管理', value: '田间管理', isShow: true},
 					{key: 'CS', nameMap: '采收信息', value: '采收信息', isShow: true},
@@ -245,6 +245,11 @@
 		created() {
 			this.loading = this.$loading({text:'拼命加载中...'});
 			this.type = getType();
+		},
+		watch:{
+			"$route": function(){
+				this.$router.go(0);
+			}
 		},
 		mounted() {
 			var that = this;
@@ -414,9 +419,10 @@
 														continue;
 													}
 												}else {
-													let resumeCode = val3.resumeCode;
-													let url = window.location.href.split('#')[0];
-													val3.resumeURL = url + '#/?resumeCode=' + resumeCode;
+													if( !val3.resumeName  || !val3.resumeCode ){
+														val[val2][i][key].splice(j, 1);
+														continue;
+													}
 												}
 											}
 											 //  key 或 value 为空 就删除这条记录
@@ -489,11 +495,12 @@
 											if( !val3.resumeName  || !val3.resumeURL ){
 												val[val2][key].splice(j, 1);
 												continue;
+											}else {
+												if( !val3.resumeName  || !val3.resumeCode ){
+													val[val2][key].splice(j, 1);
+													continue;
+												}
 											}
-										}else {
-											let resumeCode = val3.resumeCode;
-											let url = window.location.href.split('#')[0];
-											val3.resumeURL = url + '#/?resumeCode=' + resumeCode;
 										}
 										// 田间管理单独处理
 									}else if( val2 == 'TJ' &&  key == 'fieldManageFarmingList'){
