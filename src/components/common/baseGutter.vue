@@ -3,7 +3,7 @@
     <el-collapse-item
         class="acc-li"
         :name="toData.class"
-        :id="toData.class"
+        :id="toData.id"
         v-show="toData.data.one.length > 0 || toData.data.two.length > 0"
         >
         <template slot="title">

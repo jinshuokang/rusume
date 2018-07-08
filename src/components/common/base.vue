@@ -3,7 +3,7 @@
     <el-collapse-item
         class="acc-li"
         :name="toData.class"
-        :id="toData.class"
+        :id="toData.id"
         v-show="toData.data.generalEntityList.length > 0">
         <template slot="title">
             <i class="acc-font"

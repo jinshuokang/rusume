@@ -6,6 +6,7 @@ import {
 export default async(url = '', data = {}, type = 'GET') => {
 	type = type.toUpperCase();
 	let path = '/farmeasy-resume-service/resumeExhibition';
+	//let path = '/farmeasy-api-gateway/farmeasy-resume-service/resumeExhibition';
 	//let path = '/resumeExhibition';
 	url = baseUrl + path + url;
 	console.log(url);
@@ -33,6 +34,7 @@ export default async(url = '', data = {}, type = 'GET') => {
 		let sendData = '';
 		if (type == 'POST') {
 			sendData = JSON.stringify(data);
+			requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		}
 

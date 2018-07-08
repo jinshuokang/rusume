@@ -65,10 +65,21 @@
             </div>
 			<!-- 折叠开始 -->
 			<el-collapse id="offsetBegin" @change="handleChange" v-model="activeNames" class="accordion-list">
+				<div v-for="(item, index) in floatInfo" :key="index">
+					<to-gutter v-if="item.key =='ZZ'" :toData="{name:'种植基本信息', class: 'ZZ', id: item.id, activeNames: activeNames,title:{one:'种子基原信息', two:'药材批次信息'}, data: {one:item.data.one, two:item.data.two, all:item.data}}"></to-gutter>
+					<to-gutter v-else-if="item.key == 'QY'" :toData="{name:'基地信息', class: 'QY',id:item.id, activeNames: activeNames, title:{one:'', two:'环境信息'}, data: {one:item.data.generalEntityList, two:item.data.environmentList, all:item.data}}">  </to-gutter>
+					<to-farm v-else-if="item.key == 'TJ'" :toData="{calss:'TJ', id:item.id,data:item.data.fieldManageFarmingList, data2:item.data.tjArr, activeNames: activeNames, delete: moduleDelete['TJ']}" @viewMore="viewMore"></to-farm>
+					<to-base v-else-if="item.key == 'CS'" :toData="{name:'采收信息', activeNames: activeNames, class: 'CS',id:item.id, data: item.data}"></to-base>
+					<to-base v-else-if="item.key == 'CJG'" :toData="{name:'初加工信息', activeNames: activeNames, class: 'CJG',id:item.id, data: item.data}"></to-base>
+					<to-base v-else-if="item.key == 'SJG'" :toData="{name:'饮片加工信息', activeNames: activeNames, class: 'SJG',id:item.id, data: item.data}"></to-base>
+					<to-base v-else-if="item.key == 'BZ'" :toData="{name:'包装信息', activeNames: activeNames, class: 'BZ',id:item.id, data: item.data}"></to-base>
+					<to-base v-else-if="item.key == 'YCC'" :toData="{name:'原料仓储', activeNames: activeNames, class: 'YCC',id:item.id, data: item.data}"></to-base>
+					<to-base v-else-if="item.key == 'CCC'" :toData="{name:'成品仓储', activeNames: activeNames, class: 'CCC',id:item.id, data: item.data}"></to-base>
+				</div>
 				<!-- 种植基本信息  -->
-				<to-gutter :toData="{name:'种植基本信息', class: 'ZZ', activeNames: activeNames,title:{one:'种子基原信息', two:'药材批次信息'}, data: {one:template.ZZ.one, two:template.ZZ.two, all:template.ZZ}}"></to-gutter>
+				<!-- <to-gutter :toData="{name:'种植基本信息', class: 'ZZ', activeNames: activeNames,title:{one:'种子基原信息', two:'药材批次信息'}, data: {one:template.ZZ.one, two:template.ZZ.two, all:template.ZZ}}"></to-gutter> -->
 				<!-- 基地信息  -->
-				<to-gutter :toData="{name:'基地信息', class: 'QY', activeNames: activeNames, title:{one:'', two:'环境信息'}, data: {one:template.QY.generalEntityList, two:template.QY.environmentList, all:template.QY}}">  </to-gutter>
+				<!-- <to-gutter :toData="{name:'基地信息', class: 'QY', activeNames: activeNames, title:{one:'', two:'环境信息'}, data: {one:template.QY.generalEntityList, two:template.QY.environmentList, all:template.QY}}">  </to-gutter> -->
 				<!-- <el-collapse-item
 					class="acc-li"
 					name="QY"
@@ -105,18 +116,18 @@
                 	</el-row>
 				</el-collapse-item>-->
 				<!-- 田间信息  -->
-				<to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames, delete: moduleDelete['TJ']}" @viewMore="viewMore"></to-farm>
+				<!-- <to-farm :toData="{data:template.TJ.fieldManageFarmingList, data2:template.TJ.tjArr, activeNames: activeNames, delete: moduleDelete['TJ']}" @viewMore="viewMore"></to-farm> -->
 				<!-- 采收管理  -->
-				<to-base :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base>
+				<!-- <to-base :toData="{name:'采收信息', activeNames: activeNames, class: 'CS', data: template.CS}"></to-base> -->
 				<!-- 初加工  -->
-				<to-base :toData="{name:'初加工信息', activeNames: activeNames, class: 'CJG', data: template.CJG}"></to-base>
+				<!-- <to-base :toData="{name:'初加工信息', activeNames: activeNames, class: 'CJG', data: template.CJG}"></to-base> -->
 				<!-- 饮片加工  -->
-				<to-base :toData="{name:'饮片加工信息', activeNames: activeNames, class: 'SJG', data: template.SJG}"></to-base>
+				<!-- <to-base :toData="{name:'饮片加工信息', activeNames: activeNames, class: 'SJG', data: template.SJG}"></to-base> -->
 				<!-- 包装信息 -->
-				<to-base :toData="{name:'包装信息', activeNames: activeNames, class: 'BZ', data: template.BZ}"></to-base>
+				<!-- <to-base :toData="{name:'包装信息', activeNames: activeNames, class: 'BZ', data: template.BZ}"></to-base> -->
 				<!-- 仓储信息  -->
-				<to-base :toData="{name:'原料仓储', activeNames: activeNames, class: 'YCC', data: template.YCC}"></to-base>
-				<to-base :toData="{name:'成品仓储', activeNames: activeNames, class: 'CCC', data: template.CCC}"></to-base>
+				<!-- <to-base :toData="{name:'原料仓储', activeNames: activeNames, class: 'YCC', data: template.YCC}"></to-base> -->
+				<!-- <to-base :toData="{name:'成品仓储', activeNames: activeNames, class: 'CCC', data: template.CCC}"></to-base> -->
 				<!-- 质检信息  -->
 				<el-collapse-item
 					class="acc-li"
@@ -135,7 +146,7 @@
 								class="zj-button"
 								:class="{ZJactive: index == ZJactive}"
 								@click="ZJactive = index">{{item.activeName}}
-						</div>
+							</div>
 						</el-col>
 					</el-row>
 					<to-zj :toData="{data: template.ZJ[ZJactive]}"></to-zj>
@@ -149,7 +160,7 @@
 					v-for="(item,index) in floatInfo"
 					:key="index"
 					ref="topScroll"
-					@click="offsetPosition(item.key, index)"
+					@click="offsetPosition(item.key, index, item.id)"
 				>
 					<span :class="{active: item.key == active}">{{item.value}}</span>
 				</li>
@@ -184,13 +195,12 @@
                 name: 'XXXX',       // 名称
 				thirdActive: 0, // 第三方显示
 				ZJactive: 0,    // 质检信息选中状态
-				active: 'QY',   // 顶部浮窗选中状态
+				active: '',   // 顶部浮窗选中状态
 				moreIsShow: false, // 树点击判断页面是否显示
 				moreData: [],      //跳转到更多传参
 				topFloat: false,   // 顶部浮窗何时出现
 				resumeCode: 'LL-20180703-000002', // 默认码
 				templateCode:'RM-20180629-000001',
-				baseInfo: [],    //履历基本信息
 				activeNames: [],   // 手风琴 展开项
 				isClick: false,     // 滑动判断的条件
 				moreScrollTop: 0,   // 点击更多获取 滑动距离
@@ -199,18 +209,31 @@
 					one: ['药材名称', '药材基原','药用部位','种苗来源','种苗供应商'],
 					two: ['种植批次号', '种植面积', '地块编号', '生产时间', '种植标准', '负责人']
 				},
-				floatInfo:[         // 根据接口动态删除
-					{key: 'ZZ', nameMap: '种植信息', value: '种植基本信息', isShow: true},
-					{key: 'QY', nameMap: '基地信息', value: '基地信息', isShow: true}, // isShow 其实可以不要
-					{key: 'TJ', nameMap: '田间管理', value: '田间管理', isShow: true},
-					{key: 'CS', nameMap: '采收信息', value: '采收信息', isShow: true},
-					{key: 'CJG', nameMap: '加工信息', value: '初加工信息', isShow: true},
-					{key: 'SJG', nameMap: '加工信息', value: '饮片加工信息', isShow: true},
-					{key: 'BZ', nameMap: '包装信息', value: '包装信息', isShow: true},
-					{key: 'YCC', nameMap: '仓储信息', value: '原料仓储', isShow: true},
-					{key: 'CCC', nameMap: '仓储信息', value: '成品仓储', isShow: true},
-					{key: 'ZJ', nameMap: '质检信息', value:'质检信息', isShow: true}
-				],
+				floatInfo:[],// 根据接口动态删除
+				floatInfoMap: {
+					'ZZ': {key: 'ZZ',  nameMap: '种植信息', value: '种植基本信息', isShow: true, data:{one:[], two:[], generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'QY': {key: 'QY', nameMap: '基地信息', value: '基地信息', isShow: true, data:{environmentList: [], generalEntityList: []}},
+					'TJ': {key: 'TJ', nameMap: '田间管理', value: '田间管理', isShow: true, data:{fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]}},
+					'CS': {key: 'CS', nameMap: '采收信息', value: '采收信息', isShow: true, data:{generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'CJG': {key: 'CJG', nameMap: '加工信息', value: '初加工信息', isShow: true, data:{generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'SJG': {key: 'SJG', nameMap: '加工信息', value: '饮片加工信息', isShow: true, data:{generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'BZ': {key: 'BZ', nameMap: '包装信息', value: '包装信息', isShow: true, data:{generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'YCC': {key: 'YCC', nameMap: '仓储信息', value: '原料仓储', isShow: true, data:{generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'CCC': {key: 'CCC', nameMap: '仓储信息', value: '成品仓储', isShow: true, data:{generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: []}},
+					'ZJ': {key: 'ZJ', nameMap: '质检信息', value:'质检信息', isShow: true, data: [{generalEntityList: [], activeName: ''}]}
+				},
+				floatInfoDelete:{
+					'ZZ':'种植信息',
+					'QY': '基地信息',
+					'TJ': '田间管理',
+					'CS': '采收信息',
+					'CJG':'加工信息',
+					'SJG':'加工信息',
+					'BZ':'包装信息',
+					'YCC':'仓储信息',
+					'CCC':'仓储信息',
+					'ZJ':'质检信息'
+				},
 				moduleDelete: { // 待删除的 key
 					'QY': [],
 					'ZZ': [],
@@ -226,15 +249,15 @@
 				},
 				template: { // lenght == 11  多一个 JB
 				/* 基本内容*/		JB: { authenticationBasicInfoList:[], generalEntityList:[] },
-				/* 基地信息*/		QY: { environmentList: [], generalEntityList: [] },
-				/* 种植基本信息*/	ZZ: { one:[], two:[], generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 基地信息*/		//QY: { environmentList: [], generalEntityList: [] },
+				/* 种植基本信息*/	//ZZ: { one:[], two:[], generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 田间管理*/		TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
-				/* 采收信息*/		CS: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 初加工信息*/		CJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 饮片加工信息*/	 SJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 包装信息*/	    BZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 原料仓储信息*/	YCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
-				/* 成品仓储*/		CCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 采收信息*/		//CS: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 初加工信息*/		//CJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 饮片加工信息*/	// SJG: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 包装信息*/	   // BZ: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 原料仓储信息*/	//YCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
+				/* 成品仓储*/		//CCC: { generalEntityList: [], insideResumeQuoteDtoList: [], externalResumeQuoteDtoList: [] },
 				/* 质检信息*/		ZJ: [{generalEntityList: [], activeName: ''}]
 				}
             }
@@ -243,10 +266,10 @@
 			toBase, toFarm, toZj, toMore, toGutter
 		},
 		created() {
-			this.loading = this.$loading({text:'拼命加载中...'});
 			this.type = getType();
 		},
 		watch:{
+			// 监听路由变化, 重新获取数据
 			"$route": "reload"
 		},
 		mounted() {
@@ -262,9 +285,34 @@
         },
         methods: {
 			reload() {
+				this.loading = this.$loading({text:'拼命加载中...'});
 				setScrollTop(0);
 				var that = this;
+				// 重置 data
 				that.activeNames = [];
+				that.logo = '';
+				that.farmLogo = '';
+				that.name = '';
+				that.thirdActive = 0;
+				that.ZJactive = 0;
+				that.active = '';
+				that.moreData = [];
+				that.noModuleArr = [];
+				that.floatInfo = [];
+				that.moduleDelete = { // 待删除的 key
+					'QY': [],
+					'ZZ': [],
+					'TJ': [],
+					'CS': [],
+					'CJG': ['加工类型', '对应批次号'],
+					'SJG': ['加工类型', '对应批次号'],
+					'BZ': ['对应批次号'],
+					'YCC': ['仓储内容', '对应批次号'],
+					'CCC': ['仓储内容', '对应批次号'],
+					'ZJ': ['检测产品批次'],
+					'JB': ['产品名称','选择企业']
+				};
+				//end
 				window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
 				//获取 url 参数
 				const params = getParams(window.location.hash.split('?')[1]);
@@ -339,11 +387,19 @@
 						if ( data2['moduleFields'] && data2['moduleFields'].length > 0 ){
 							data2['moduleFields'].forEach( (val, index) => {
 								if( val.value == 2) {
-									for( let i = 0; i < that.floatInfo.length; i++ ){
-										var val2 = that.floatInfo[i];
-										if( val.key == val2.nameMap ) {
-											that.floatInfo.splice(i, 1);
-											i--;
+									// for( let i = 0; i < that.floatInfo.length; i++ ){
+									// 	var val2 = that.floatInfo[i];
+									// 	if( val.key == val2.nameMap ) {
+									// 		that.floatInfo.splice(i, 1);
+									// 		i--;
+									// 		that.noModuleArr.push(val2.key);
+									// 	}
+									// 	if( val.key == '产品信息' ){
+									// 		that.noModuleArr.push('JB');
+									// 	}
+									// }
+									for(let key in that.floatInfoDelete){
+										if( val.key == that.floatInfoDelete[key]){
 											that.noModuleArr.push(val2.key);
 										}
 										if( val.key == '产品信息' ){
@@ -371,6 +427,7 @@
 					//  ----------    这里已经处理好模块的显示与否 floatInfo 中     ------------------------------
 					var list = data.data.resumeList || [];
 					//list.forEach( (val, index) => {
+					var aindex = 0;
 					for(var k = list.length - 1; k >= 0; k--){
 						var val = list[k];
 						var index = k;
@@ -379,6 +436,16 @@
 							if ( that.noModuleArr.indexOf(val2) != -1 ){
 								list.splice(k, 1);
 								return;
+							}
+							// push 到 floatInfo
+							if(val2 != 'JB'){
+								that.floatInfo.unshift(that.floatInfoMap[val2]);
+								if(val2 != 'ZJ'){
+									aindex++;
+									that.floatInfo[0].id = val2 + k;
+								}else if(val2 == 'ZJ'){
+									that.floatInfo[0].id = val2;
+								}
 							}
 							//  数组处理
 							if ( Array.isArray( val[val2] ) ){
@@ -494,7 +561,8 @@
 									}
 									// 田间管理 拷贝
 									if( val2 == 'TJ' &&  key == 'fieldManageFarmingList' ){
-										that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
+										//that.template.TJ.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
+										that.floatInfo[0].data.tjArr = JSON.parse(JSON.stringify(val[val2][key]));
 									}
 									for( var j = val[val2][key].length - 1; j >= 0; j--){
 										var val3 = val[val2][key][j];
@@ -595,9 +663,11 @@
 									for( let i = 0; i < val[val2].generalEntityList.length; i++){
 										let row = val[val2].generalEntityList[i];
 										if( that.zzFloor.one.includes(row.key) ){
-											that.template['ZZ'].one.push(row)
+											//that.template['ZZ'].one.push(row)
+											that.floatInfo[0].data.one.push(row);
 										}else if(that.zzFloor.two.includes(row.key)){
-											that.template['ZZ'].two.push(row)
+											//that.template['ZZ'].two.push(row)
+											that.floatInfo[0].data.two.push(row);
 										}
 										if( row.key == '种苗来源'){
 											if(row.value == 2) row.value = '外采';
@@ -622,7 +692,14 @@
 									if(isImg (val[val2].logoImgUrl)) that.logo = val[val2].logoImgUrl;
 								}
 							}
-							Object.assign( that.template[val2], val[val2] );
+							if( val2 == 'JB' || val2 == 'ZJ' || val2 == 'TJ'){
+								Object.assign( that.template[val2], val[val2] );
+							}else {
+								Object.assign( that.floatInfo[0].data, val[val2] );
+							}
+							if( val2 == 'TJ') {
+								Object.assign( that.floatInfo[0].data, val[val2] );
+							}
 						})
 					}
 					// 这里判断 template 如果内容 就 将 floatInfo 中的 删掉
@@ -630,13 +707,13 @@
 						var val = that.floatInfo[i];
 						// 基地信息 特殊处理
 						if( val.key == 'QY' ){
-							if( that.template.QY.environmentList.length == 0 && that.template.QY.generalEntityList == 0 ){
+							if( val.data.environmentList.length == 0 && val.data.generalEntityList == 0 ){
 								that.floatInfo.splice(i, 1);
 								i--;
 							}
 						// 田间 特殊处理
 						}else if( val.key == 'TJ' ){
-							if ( that.template.TJ.fieldManageFarmingList.length == 0 || that.template.TJ.fieldManageFarmingList[0].generalEntityList.length == 0 ){
+							if ( val.data.fieldManageFarmingList.length == 0 || val.data.fieldManageFarmingList[0].generalEntityList.length == 0 ){
 								that.floatInfo.splice(i, 1);
 								i--;
 							}
@@ -648,7 +725,7 @@
 							}
 						// 其他公共模块
 						}else {
-							if( that.template[val.key].generalEntityList.length == 0 ){
+							if( val.data.generalEntityList.length == 0 ){
 								that.floatInfo.splice(i, 1);
 								i--;
 							}
@@ -683,11 +760,11 @@
 				})
 			},
 			//顶部浮窗点击
-			offsetPosition(id, index) {
+			offsetPosition(id, index, id2) {
 				var scrollTop = getScrollTop();
 				this.isClick = true;
 				this.active = id;
-				var target = document.querySelector('#' + id);
+				var target = document.querySelector('#' + id2);
 				if( !target ||  !target.offsetTop ) return;
 				let offsetT = target.offsetTop - 60;
 				if(scrollTop != offsetT) setScrollTop(offsetT);
@@ -717,7 +794,7 @@
 				else this.topFloat = false;
 				if( this.topFloat ) {
 					this.floatInfo.forEach( (val, index) => {
-						var ele = document.querySelector('#' + val.key);
+						var ele = document.querySelector('#' + val.id);
 						if( ele ){
 							// 元素高度
 							var eleHeight = ele.offsetHeight;
