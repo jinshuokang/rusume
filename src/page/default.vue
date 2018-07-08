@@ -264,6 +264,7 @@
 			reload() {
 				setScrollTop(0);
 				var that = this;
+				that.activeNames = [];
 				window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
 				//获取 url 参数
 				const params = getParams(window.location.hash.split('?')[1]);
