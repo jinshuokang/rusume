@@ -2,7 +2,7 @@
     <!-- 适用 企业 种植 -->
     <el-collapse-item
         class="acc-li"
-        :name="toData.class"
+        :name="toData.id"
         :id="toData.id"
         v-show="toData.data.one.length > 0 || toData.data.two.length > 0"
         >

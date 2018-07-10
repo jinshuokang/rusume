@@ -2,7 +2,7 @@
     <!-- 基本模版 -> ( 图 + 文字 + 履历外链 ) -->
     <el-collapse-item
         class="acc-li"
-        :name="toData.class"
+        :name="toData.id"
         :id="toData.id"
         v-show="toData.data.generalEntityList.length > 0">
         <template slot="title">
@@ -29,7 +29,7 @@
                 :key="item.resumeURL + index"
             >
             <!-- <a class="LL-href" :href="item.resumeURL">{{item.resumeName}}</a> -->
-            <router-link class="LL-href" :to="{name: 'default', query:{ resumeCode: item.resumeCode }}">{{item.resumeName}}</router-link>
+            <router-link class="LL-href" :to="{name: 'home', query:{ resumeCode: item.resumeCode }}">{{item.resumeName}}</router-link>
             </div>
             <div class="LL-button"
                 v-for="(item, index) in toData.data.externalResumeQuoteDtoList"

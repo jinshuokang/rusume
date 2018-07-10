@@ -10,6 +10,7 @@ import elementUi from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import FastClick from 'fastclick'
+import fetch from '@/config/fetch'
 
 if ('addEventListener' in document) {
     document.addEventListener('DOMContentLoaded', function() {
@@ -19,6 +20,30 @@ if ('addEventListener' in document) {
 
 Vue.use(elementUi);
 Vue.config.productionTip = false
+
+// 路由拦截  判断进入哪个主题
+router.beforeEach((to, from, next) => {
+    if(to.meta.require) {
+        next({name: 'default', query:{'resumeCode': to.query.resumeCode, 'templateCode': to.query.templateCode}});
+        // 请求接口
+        // fetch('/getTemplateUrl/' + to.query.resumeCode,{}).then( (data) => {
+        //     if( data.code != '0000' ) {
+        //         this.loading.close();
+        //         next({path: '/404'});
+        //     }
+        //     let route = data.data;
+        //     next({name: 'default', query:{'resumeCode': to.query.resumeCode, 'templateCode': to.query.templateCode}});
+
+        // }).catch( (error) => {
+        //     console.log(error);
+        //     this.loading.close();
+        //     next({path: '/404'});
+        // })
+    }else {
+        next();
+    }
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -35,7 +35,6 @@ export default async(url = '', data = {}, type = 'GET') => {
 		if (type == 'POST') {
 			sendData = JSON.stringify(data);
 			requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		}
 
 		requestObj.send(sendData);

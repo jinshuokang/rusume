@@ -162,7 +162,7 @@
 					ref="topScroll"
 					@click="offsetPosition(item.key, index, item.id)"
 				>
-					<span :class="{active: item.key == active}">{{item.value}}</span>
+					<span :class="{active: item.id == active}">{{item.value}}</span>
 				</li>
 			</ul>
 		</div>
@@ -270,7 +270,10 @@
 		},
 		watch:{
 			// 监听路由变化, 重新获取数据
-			"$route": "reload"
+			//"$route": "reload"
+			"$route": function(){
+				window.location.reload();
+			}
 		},
 		mounted() {
 			this.reload();
@@ -289,34 +292,34 @@
 				setScrollTop(0);
 				var that = this;
 				// 重置 data
-				that.activeNames = [];
-				that.logo = '';
-				that.farmLogo = '';
-				that.name = '';
-				that.thirdActive = 0;
-				that.ZJactive = 0;
-				that.active = '';
-				that.moreData = [];
-				that.noModuleArr = []; // 待删除的 模块
-				that.floatInfo = []; // 重置数据
-				that.moduleDelete = { // 待删除的 key
-					'QY': [],
-					'ZZ': [],
-					'TJ': [],
-					'CS': [],
-					'CJG': ['加工类型', '对应批次号'],
-					'SJG': ['加工类型', '对应批次号'],
-					'BZ': ['对应批次号'],
-					'YCC': ['仓储内容', '对应批次号'],
-					'CCC': ['仓储内容', '对应批次号'],
-					'ZJ': ['检测产品批次'],
-					'JB': ['产品名称','选择企业']
-				};
-				that.template = { // 重置数据
-					JB: { authenticationBasicInfoList:[], generalEntityList:[] },
-					TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
-					ZJ: [{generalEntityList: [], activeName: ''}]
-				};
+				// that.activeNames = [];
+				// that.logo = '';
+				// that.farmLogo = '';
+				// that.name = '';
+				// that.thirdActive = 0;
+				// that.ZJactive = 0;
+				// that.active = '';
+				// that.moreData = [];
+				// that.noModuleArr = []; // 待删除的 模块
+				// that.floatInfo = []; // 重置数据
+				// that.moduleDelete = { // 待删除的 key
+				// 	'QY': [],
+				// 	'ZZ': [],
+				// 	'TJ': [],
+				// 	'CS': [],
+				// 	'CJG': ['加工类型', '对应批次号'],
+				// 	'SJG': ['加工类型', '对应批次号'],
+				// 	'BZ': ['对应批次号'],
+				// 	'YCC': ['仓储内容', '对应批次号'],
+				// 	'CCC': ['仓储内容', '对应批次号'],
+				// 	'ZJ': ['检测产品批次'],
+				// 	'JB': ['产品名称','选择企业']
+				// };
+				// that.template = { // 重置数据
+				// 	JB: { authenticationBasicInfoList:[], generalEntityList:[] },
+				// 	TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
+				// 	ZJ: [{generalEntityList: [], activeName: ''}]
+				// };
 				//end
 				window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
 				//获取 url 参数
@@ -444,7 +447,8 @@
 							}
 							// push 到 floatInfo
 							if(val2 != 'JB'){
-								that.floatInfo.unshift(that.floatInfoMap[val2]);
+								let clone = JSON.parse(JSON.stringify(that.floatInfoMap[val2]));
+								that.floatInfo.unshift(clone);
 								if(val2 != 'ZJ'){
 									aindex++;
 									that.floatInfo[0].id = val2 + k;
@@ -665,6 +669,8 @@
 							// 种植拆分
 							if( val2 == 'ZZ') {
 								if( val[val2].generalEntityList.length > 0){
+									that.floatInfo[0].data.one = [];
+									that.floatInfo[0].data.two = [];
 									for( let i = 0; i < val[val2].generalEntityList.length; i++){
 										let row = val[val2].generalEntityList[i];
 										if( that.zzFloor.one.includes(row.key) ){
@@ -768,7 +774,7 @@
 			offsetPosition(id, index, id2) {
 				var scrollTop = getScrollTop();
 				this.isClick = true;
-				this.active = id;
+				this.active = id2;
 				var target = document.querySelector('#' + id2);
 				if( !target ||  !target.offsetTop ) return;
 				let offsetT = target.offsetTop - 60;
@@ -807,7 +813,7 @@
 							var eleOffset = ele.offsetTop;
 							// 浮窗元素 选中状态
 							if( eleOffset + eleHeight > scrollTop &&  eleOffset <= (clientHeight/2 + scrollTop) ){
-								this.active = val.key;
+								this.active = val.id;
 								var oneWidth = this.clientW / 4;
 								var topTarget = this.$refs.topScroll[index];
 								if( !topTarget ) return;
