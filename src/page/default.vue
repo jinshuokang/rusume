@@ -270,10 +270,10 @@
 		},
 		watch:{
 			// 监听路由变化, 重新获取数据
-			//"$route": "reload"
-			"$route": function(){
-				window.location.reload();
-			}
+			"$route": "reload"
+			// "$route": function(){
+			// 	window.location.reload();
+			// }
 		},
 		mounted() {
 			this.reload();
@@ -292,34 +292,34 @@
 				setScrollTop(0);
 				var that = this;
 				// 重置 data
-				// that.activeNames = [];
-				// that.logo = '';
-				// that.farmLogo = '';
-				// that.name = '';
-				// that.thirdActive = 0;
-				// that.ZJactive = 0;
-				// that.active = '';
-				// that.moreData = [];
-				// that.noModuleArr = []; // 待删除的 模块
-				// that.floatInfo = []; // 重置数据
-				// that.moduleDelete = { // 待删除的 key
-				// 	'QY': [],
-				// 	'ZZ': [],
-				// 	'TJ': [],
-				// 	'CS': [],
-				// 	'CJG': ['加工类型', '对应批次号'],
-				// 	'SJG': ['加工类型', '对应批次号'],
-				// 	'BZ': ['对应批次号'],
-				// 	'YCC': ['仓储内容', '对应批次号'],
-				// 	'CCC': ['仓储内容', '对应批次号'],
-				// 	'ZJ': ['检测产品批次'],
-				// 	'JB': ['产品名称','选择企业']
-				// };
-				// that.template = { // 重置数据
-				// 	JB: { authenticationBasicInfoList:[], generalEntityList:[] },
-				// 	TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
-				// 	ZJ: [{generalEntityList: [], activeName: ''}]
-				// };
+				that.activeNames = [];
+				that.logo = '';
+				that.farmLogo = '';
+				that.name = '';
+				that.thirdActive = 0;
+				that.ZJactive = 0;
+				that.active = '';
+				that.moreData = [];
+				that.noModuleArr = []; // 待删除的 模块
+				that.floatInfo = []; // 重置数据
+				that.moduleDelete = { // 待删除的 key
+					'QY': [],
+					'ZZ': [],
+					'TJ': [],
+					'CS': [],
+					'CJG': ['加工类型', '对应批次号'],
+					'SJG': ['加工类型', '对应批次号'],
+					'BZ': ['对应批次号'],
+					'YCC': ['仓储内容', '对应批次号'],
+					'CCC': ['仓储内容', '对应批次号'],
+					'ZJ': ['检测产品批次'],
+					'JB': ['产品名称','选择企业']
+				};
+				that.template = { // 重置数据
+					JB: { authenticationBasicInfoList:[], generalEntityList:[] },
+					TJ: { fieldManageFarmingList: [{generalEntityList:[]}],generalEntityList: [], tjArr:[]},
+					ZJ: [{generalEntityList: [], activeName: ''}]
+				};
 				//end
 				window.addEventListener('scroll', throttle(that.handleScroll, 200, 400));
 				//获取 url 参数
